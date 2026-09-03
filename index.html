@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DomainRiskManager | GenLayer dApp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --surface-color: #141414;
+            --surface-hover: #1f1f1f;
+            --border-color: #262626;
+            --neon-accent: #d4f938;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --font-main: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-primary); font-family: var(--font-main); line-height: 1.5; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; scroll-behavior: smooth; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; width: 100%; }
+
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 32px 0; }
+        .logo { font-size: 24px; font-weight: 700; letter-spacing: -0.04em; }
+        .logo span { color: var(--neon-accent); }
+        .nav-links { display: none; gap: 40px; }
+        @media (min-width: 768px) { .nav-links { display: flex; } }
+        .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .nav-link:hover { color: var(--text-primary); }
+        
+        .connect-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 20px; border-radius: 24px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
+        .connect-btn:hover { border-color: #404040; background: rgba(255,255,255,0.05); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+        .connected-dot { background-color: #4ade80; box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
+
+        /* Hero */
+        .hero { display: grid; grid-template-columns: 1fr; gap: 64px; padding: 60px 0 80px; align-items: center; position: relative; }
+        @media (min-width: 992px) { .hero { grid-template-columns: 1fr 1fr; } }
+        .hero-content h1 { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 24px; }
+        .hero-content h1 .highlight { color: var(--neon-accent); }
+        .hero-content p { font-size: 1.125rem; color: var(--text-secondary); max-width: 400px; margin-bottom: 40px; }
+        .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+        
+        .btn { text-decoration: none; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
+        .btn-primary { background-color: var(--neon-accent); color: #000000; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary { background-color: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background-color: var(--surface-hover); }
+
+        /* Cube Graphic */
+        .hero-graphic { display: none; perspective: 1000px; height: 300px; }
+        @media (min-width: 992px) { .hero-graphic { display: flex; justify-content: center; align-items: center; } }
+        .cube { width: 180px; height: 180px; background: rgba(20, 20, 20, 0.9); transform: rotateX(60deg) rotateZ(-45deg); transform-style: preserve-3d; box-shadow: -20px 20px 60px rgba(212, 249, 56, 0.1), inset 0 0 0 1px var(--border-color); position: relative; }
+        .cube::before, .cube::after { content: ''; position: absolute; width: 100%; height: 100%; background: rgba(30, 30, 30, 0.9); border: 1px solid var(--border-color); }
+        .cube::before { transform: rotateX(-90deg) translateY(-100%); transform-origin: top center; box-shadow: inset 0 0 40px rgba(212, 249, 56, 0.05); }
+        .cube::after { transform: rotateY(90deg) translateX(100%); transform-origin: center right; }
+        .cube-glow { position: absolute; width: 100%; height: 100%; background: var(--neon-accent); filter: blur(70px); opacity: 0.15; transform: translateZ(-50px); }
+
+        /* Stats Bar */
+        .stats-bar { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; margin-bottom: 80px; }
+        @media (min-width: 768px) { .stats-bar { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+        .stat-item { display: flex; align-items: flex-start; gap: 16px; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(212, 249, 56, 0.03); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: var(--neon-accent); }
+        .stat-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .stat-content h4 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+        .stat-content p { font-size: 0.875rem; color: var(--text-secondary); }
+
+        /* Features Section */
+        .features { display: grid; grid-template-columns: 1fr; gap: 64px; padding-bottom: 80px; }
+        @media (min-width: 992px) { .features { grid-template-columns: 350px 1fr; } }
+        .features-header h2 { font-size: 2.25rem; font-weight: 600; line-height: 1.2; margin-bottom: 16px; }
+        .features-header p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 32px; }
+        .features-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media (min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+        .feature-card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px 24px; transition: background-color 0.2s; }
+        .feature-card:hover { background-color: var(--surface-hover); }
+        .feature-card .icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(212, 249, 56, 0.05); border: 1px solid rgba(212, 249, 56, 0.1); color: var(--neon-accent); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+        .feature-card .icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .feature-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
+        .feature-card p { font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* Architecture Section */
+        .technical-details { padding-bottom: 100px; }
+        .tech-header { text-align: center; margin-bottom: 64px; }
+        .tech-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
+        .tech-header p { color: var(--text-secondary); font-size: 1.1rem; }
+        
+        .state-machine { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 48px 24px; overflow-x: auto; margin-bottom: 64px; }
+        .state-machine h3 { margin-bottom: 40px; text-align: center; font-size: 1.25rem; }
+        .pipeline { display: flex; flex-direction: column; align-items: center; gap: 24px; min-width: 700px; }
+        .state-node { padding: 16px 32px; border-radius: 12px; text-align: center; min-width: 200px; }
+        .node-queued { border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); font-weight: 500; }
+        .node-ai { border: 1px solid var(--neon-accent); background: rgba(212, 249, 56, 0.05); color: var(--neon-accent); font-weight: 600; box-shadow: 0 0 20px rgba(212, 249, 56, 0.1); }
+        .node-outcomes { display: flex; gap: 40px; justify-content: center; width: 100%; }
+        .node-safe { border: 1px solid #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); width: 180px; }
+        .node-manual { border: 1px solid #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.05); width: 180px; }
+        .node-denied { border: 1px solid #f87171; color: #f87171; background: rgba(248, 113, 113, 0.05); width: 180px; }
+        .node-steward { border: 1px dashed var(--border-color); color: var(--text-secondary); font-size: 14px; padding: 12px 32px; }
+        .arrow-down { color: var(--border-color); font-size: 24px; }
+
+        .risk-table-wrapper { overflow-x: auto; }
+        .risk-table-wrapper h3 { margin-bottom: 24px; font-size: 1.25rem; }
+        .risk-table { width: 100%; border-collapse: collapse; background: var(--surface-color); border-radius: 16px; border: 1px solid var(--border-color); text-align: left; min-width: 600px; }
+        .risk-table th { padding: 20px; font-weight: 600; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-color); }
+        .risk-table td { padding: 20px; border-bottom: 1px solid var(--border-color); }
+        .risk-table tr:last-child td { border-bottom: none; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-denied { border: 1px solid #f87171; color: #f87171; }
+        .status-manual { border: 1px solid #fbbf24; color: #fbbf24; }
+        .status-live { border: 1px solid #4ade80; color: #4ade80; }
+
+        /* Dashboard dApp Section */
+        .dapp-header { text-align: center; margin-bottom: 48px; }
+        .dapp-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
+        .contract-badge { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-family: monospace; font-size: 13px; color: var(--text-secondary); }
+        
+        .dashboard { display: grid; grid-template-columns: 1fr; gap: 24px; padding-bottom: 80px; }
+        @media (min-width: 992px) { .dashboard { grid-template-columns: 1fr 1fr; } }
+        
+        .panel { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--border-color); transition: background 0.3s; }
+        .panel:hover::before { background: var(--neon-accent); }
+        .panel h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        
+        .input-group { margin-bottom: 16px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .input-label { display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); }
+        input[type="text"], input[type="number"], select, textarea { width: 100%; background: #000; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; color: #fff; font-family: var(--font-main); font-size: 14px; outline: none; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--neon-accent); }
+        textarea { resize: vertical; min-height: 80px; }
+        
+        .panel-btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; background-color: var(--neon-accent); color: #000; margin-top: 8px; margin-bottom: 16px;}
+        .panel-btn:hover { opacity: 0.9; }
+        .panel-btn-sec { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+        .panel-btn-sec:hover { background-color: rgba(255,255,255,0.05); }
+        .inline-btn { margin-top: 0; margin-bottom: 0; }
+
+        .divider { height: 1px; background: var(--border-color); margin: 24px 0; }
+
+        .console-output { margin-top: auto; padding: 16px; border-radius: 8px; background: #000; border: 1px solid var(--border-color); font-family: monospace; font-size: 12px; color: var(--text-secondary); min-height: 60px; word-wrap: break-word; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        .status-success { color: #4ade80; }
+        .status-error { color: #f87171; }
+        .status-warn { color: #fbbf24; }
+
+        footer { border-top: 1px solid var(--border-color); padding: 40px 0; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav>
+            <div class="logo">DomainRisk<span>.</span></div>
+            <div class="nav-links">
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#dapp" class="nav-link">dApp</a>
+                <a href="https://github.com/dorinalunar/domain_risk_manager_gl" target="_blank" class="nav-link">GitHub</a>
+            </div>
+            <button id="connectBtn" class="connect-btn">
+                <span id="walletText">Connect Wallet</span>
+                <span id="statusDot" class="status-dot"></span>
+            </button>
+        </nav>
+
+        <!-- Hero Section -->
+        <main class="hero">
+            <div class="hero-content">
+                <h1>Evaluate today.<br><span class="highlight">Resolve</span> tomorrow.</h1>
+                <p>An autonomous Intelligent Smart Contract on GenLayer. Manage commitments, detect clashes, and enforce semantic rules.</p>
+                <div class="hero-btns">
+                    <a href="#dapp" class="btn btn-primary">Launch dApp <span>↓</span></a>
+                    <a href="#architecture" class="btn btn-secondary">Explore Architecture</a>
+                </div>
+            </div>
+            <div class="hero-graphic">
+                <div class="cube"><div class="cube-glow"></div></div>
+            </div>
+        </main>
+
+        <!-- Stats Bar -->
+        <section class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                <div class="stat-content"><h4>6</h4><p>Conflict Types</p></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
+                <div class="stat-content"><h4>GenVM</h4><p>AI Consensus</p></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
+                <div class="stat-content"><h4>py-genlayer</h4><p>SDK Integration</p></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+                <div class="stat-content"><h4>1.5k</h4><p>Char Text Limit</p></div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="features-header">
+                <h2>Built for agents.</h2>
+                <p>Everything you need to secure decentralized commerce and commitments.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                    <h3>Consensus</h3>
+                    <p>Leverages non-deterministic AI via run_nondet_unsafe to semantically analyze incoming agreements.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                    <h3>Govern</h3>
+                    <p>Robust multi-state lifecycle with whitelist permissions and global steward override capabilities.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                    <h3>Integrate</h3>
+                    <p>Built-in IResolutionListener interface for seamless cross-contract event hooks and dApp syncing.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section class="technical-details" id="architecture">
+            <div class="tech-header">
+                <h2>Architecture & Logic</h2>
+                <p>Transparent state transitions and semantic rules engine.</p>
+            </div>
+            <!-- State Machine Diagram -->
+            <div class="state-machine">
+                <h3>Transaction Lifecycle</h3>
+                <div class="pipeline">
+                    <div class="state-node node-queued">📥 QUEUED <br><span style="font-size: 12px; color: var(--text-secondary);">Agreement Submitted</span></div>
+                    <div class="arrow-down">↓</div>
+                    <div class="state-node node-ai">🧠 GenVM AI Consensus <br><span style="font-size: 12px; font-weight: 400; font-family: monospace;">run_nondet_unsafe()</span></div>
+                    <div class="arrow-down">↓</div>
+                    <div class="node-outcomes">
+                        <div class="state-node node-safe">✅ LIVE<br><span style="font-size: 12px; font-weight: 400;">Outcome: Safe</span></div>
+                        <div class="state-node node-manual">⚠️ MANUAL_CHECK<br><span style="font-size: 12px; font-weight: 400;">Outcome: Unclear</span></div>
+                        <div class="state-node node-denied">❌ DENIED<br><span style="font-size: 12px; font-weight: 400;">Outcome: Clash</span></div>
+                    </div>
+                    <div class="arrow-down">↓</div>
+                    <div class="state-node node-steward">👑 Global Steward Override (Force execution)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive dApp Section -->
+        <section id="dapp">
+            <div class="dapp-header">
+                <h2>Agentic Command Center</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">Execute on-chain transactions via GenLayer Studio Network.</p>
+                <div class="contract-badge" id="contractAddr">0xB1871Ce9bc99A4dC24b0727ac78011000d480F76</div>
+            </div>
+
+            <div class="dashboard">
+                <!-- PANEL 1: Admin / Setup -->
+                <div class="panel">
+                    <h2>⚙️ 1. Setup & Admin</h2>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Add Steward (Admin Only)</label>
+                        <div class="row-2">
+                            <input type="text" id="addStewardAcc" placeholder="Address 0x...">
+                            <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('add_steward', [document.getElementById('addStewardAcc').value], 'adminConsole')">Add Steward</button>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Register Domain</label>
+                    <input type="text" id="regDomainName" placeholder="Domain Name (e.g. defi_q4)" style="margin-bottom: 8px;">
+                    <input type="text" id="regDomainOwner" placeholder="Owner Address (0x...)">
+                    <button class="panel-btn" onclick="executeTx('register_domain', [document.getElementById('regDomainName').value, document.getElementById('regDomainOwner').value], 'adminConsole')">Register Domain</button>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Configure Domain Risk</label>
+                    <input type="text" id="cfgDomain" placeholder="Domain Name" style="margin-bottom: 8px;">
+                    <div class="row-2">
+                        <select id="cfgStrict"><option value="true">Strict: True</option><option value="false">Strict: False</option></select>
+                        <select id="cfgMinor"><option value="true">Ignore Minor: True</option><option value="false">Ignore Minor: False</option></select>
+                    </div>
+                    <button class="panel-btn panel-btn-sec" onclick="executeTx('configure_domain_risk', [document.getElementById('cfgDomain').value, document.getElementById('cfgStrict').value === 'true', document.getElementById('cfgMinor').value === 'true'], 'adminConsole')">Save Config</button>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Set Whitelist</label>
+                    <input type="text" id="wlDomain" placeholder="Domain Name" style="margin-bottom: 8px;">
+                    <input type="text" id="wlAccount" placeholder="Address (0x...)" style="margin-bottom: 8px;">
+                    <select id="wlStatus" style="margin-bottom: 8px;"><option value="true">Allow</option><option value="false">Revoke</option></select>
+                    <button class="panel-btn panel-btn-sec" onclick="executeTx('set_whitelist', [document.getElementById('wlDomain').value, document.getElementById('wlAccount').value, document.getElementById('wlStatus').value === 'true'], 'adminConsole')">Update Whitelist</button>
+                    
+                    <div id="adminConsole" class="console-output">Awaiting input...</div>
+                </div>
+
+                <!-- PANEL 2: Submissions -->
+                <div class="panel">
+                    <h2>📥 2. Submission Cycle</h2>
+                    
+                    <label class="input-label">Submit Agreement</label>
+                    <input type="text" id="subDomain" placeholder="Target Domain" style="margin-bottom: 8px;">
+                    <textarea id="subBody" placeholder="Body Text (Max 1500 chars)" style="margin-bottom: 8px;"></textarea>
+                    <input type="text" id="subBg" placeholder="Background Info (Optional)" style="margin-bottom: 8px;">
+                    <input type="text" id="subHook" value="0x0000000000000000000000000000000000000000">
+                    <button class="panel-btn" onclick="executeTx('submit_agreement', [document.getElementById('subDomain').value, document.getElementById('subBody').value, document.getElementById('subBg').value, document.getElementById('subHook').value], 'subConsole')">Queue Submission</button>
+                    
+                    <div class="divider"></div>
+                    <div class="input-group">
+                        <label class="input-label">Manage Submissions (Revoke / Reload / Archive)</label>
+                        <input type="number" id="manageId" placeholder="Submission ID" style="margin-bottom: 8px;">
+                        <input type="text" id="archiveCause" placeholder="Archive Cause (Only for Archive action)" style="margin-bottom: 8px;">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('reload_submission', [document.getElementById('manageId').value], 'subConsole')">Reload</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #f87171; color: #f87171;" onclick="executeTx('revoke_submission', [document.getElementById('manageId').value], 'subConsole')">Revoke</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="executeTx('archive_record', [document.getElementById('manageId').value, document.getElementById('archiveCause').value], 'subConsole')">Archive</button>
+                        </div>
+                    </div>
+
+                    <div id="subConsole" class="console-output">Awaiting submission...</div>
+                </div>
+
+                <!-- PANEL 3: AI & Execution -->
+                <div class="panel">
+                    <h2>🧠 3. AI & Execution</h2>
+                    
+                    <label class="input-label">Evaluate Submission (GenVM)</label>
+                    <div class="row-2">
+                        <input type="number" id="evalId" placeholder="Submission ID">
+                        <button class="panel-btn inline-btn" onclick="executeTx('evaluate_submission', [document.getElementById('evalId').value], 'evalConsole')">Run AI Check</button>
+                    </div>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Evaluate Batch (Comma separated IDs)</label>
+                    <div class="row-2">
+                        <input type="text" id="batchIds" placeholder="e.g. 1, 2, 3">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="executeBatchEval()">Run Batch</button>
+                    </div>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Steward Override (Force Outcome)</label>
+                    <input type="number" id="overId" placeholder="Submission ID" style="margin-bottom: 8px;">
+                    <div class="row-2" style="margin-bottom: 8px;">
+                        <select id="overOutcome"><option value="SAFE">SAFE (Live)</option><option value="CLASH">CLASH (Denied)</option></select>
+                        <input type="text" id="overRationale" placeholder="Rationale">
+                    </div>
+                    <button class="panel-btn panel-btn-sec" onclick="executeTx('override_judgement', [document.getElementById('overId').value, document.getElementById('overOutcome').value, document.getElementById('overRationale').value], 'evalConsole')">Force Override</button>
+                    
+                    <div class="divider"></div>
+                    <label class="input-label">Trigger Cross-Contract Hook</label>
+                    <div class="row-2">
+                        <input type="number" id="hookId" placeholder="Submission ID">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('trigger_hook', [document.getElementById('hookId').value], 'evalConsole')">Fire Hook</button>
+                    </div>
+
+                    <div id="evalConsole" class="console-output">Awaiting execution...</div>
+                </div>
+
+                <!-- PANEL 4: Read State (Views) -->
+                <div class="panel">
+                    <h2>🔍 4. Explorer (Views)</h2>
+                    
+                    <label class="input-label">Submission Data (ID required)</label>
+                    <div class="row-2" style="margin-bottom: 8px;">
+                        <input type="number" id="viewId" placeholder="Submission ID">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_submission', [document.getElementById('viewId').value], 'viewConsole')">State</button>
+                    </div>
+                    <div class="row-2">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_content', [document.getElementById('viewId').value], 'viewConsole')">Content Text</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_judgement', [document.getElementById('viewId').value], 'viewConsole')">AI Judgement</button>
+                    </div>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Get Specific Issue (ID & Issue Index required)</label>
+                    <div class="row-2">
+                        <input type="number" id="issueIdx" placeholder="Issue Index (e.g. 0)">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_issue', [document.getElementById('viewId').value, document.getElementById('issueIdx').value], 'viewConsole')">Fetch Issue</button>
+                    </div>
+
+                    <div class="divider"></div>
+                    <label class="input-label">Get Domain State</label>
+                    <input type="text" id="dsActor" placeholder="Actor Address 0x..." style="margin-bottom: 8px;">
+                    <div class="row-2">
+                        <input type="text" id="dsDomain" placeholder="Domain Name">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_domain_state', [document.getElementById('dsActor').value, document.getElementById('dsDomain').value], 'viewConsole')">Fetch Domain</button>
+                    </div>
+
+                    <div class="divider"></div>
+                    <div class="row-2">
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="getEvent()">Read Event log</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('stats', [], 'viewConsole')">Global Stats</button>
+                    </div>
+                    <input type="number" id="eventIdx" placeholder="Event Index (e.g. 0)" style="margin-top: 8px; width: 50%;">
+
+                    <div id="viewConsole" class="console-output">Output will appear here...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 DomainRiskManager. Built for GenLayer The Tank.</p>
+        </footer>
+    </div>
+
+    <!-- Web3 Integration Logic -->
+    <script>
+        const CONTRACT_ADDRESS = "0xB1871Ce9bc99A4dC24b0727ac78011000d480F76";
+        
+        // GenLayer Studio Network configuration based on your screenshot
+        const genLayerNetwork = {
+            chainId: '0xf22f', // 61999 in hex
+            chainName: 'GenLayer Studio',
+            nativeCurrency: {
+                name: 'GEN',
+                symbol: 'GEN',
+                decimals: 18
+            },
+            rpcUrls: ['https://studio.genlayer.com/api'],
+            blockExplorerUrls: ['https://explorer-studio.genlayer.com']
+        };
+
+        // Full ABI mapping
+        const CONTRACT_ABI = [
+            // Writes
+            "function add_steward(address account) public",
+            "function register_domain(string domain, address owner) public",
+            "function configure_domain_risk(string domain, bool strict_mode, bool ignore_minor) public",
+            "function set_whitelist(string domain, address account, bool is_allowed) public",
+            "function submit_agreement(string domain, string body_text, string bg_info, address hook) public returns (uint256)",
+            "function reload_submission(uint256 submission_id) public",
+            "function evaluate_batch(uint256[] submission_ids) public",
+            "function evaluate_submission(uint256 submission_id) public",
+            "function override_judgement(uint256 submission_id, string force_outcome, string rationale) public",
+            "function revoke_submission(uint256 submission_id) public",
+            "function archive_record(uint256 uid, string cause) public",
+            "function trigger_hook(uint256 submission_id) public",
+            // Views
+            "function get_submission(uint256 submission_id) public view returns (string)",
+            "function get_content(uint256 submission_id) public view returns (string)",
+            "function get_judgement(uint256 submission_id) public view returns (string)",
+            "function get_issue(uint256 submission_id, uint32 index) public view returns (string)",
+            "function get_domain_state(address actor, string domain) public view returns (string)",
+            "function get_event(uint256 index) public view returns (string)",
+            "function stats() public view returns (string)"
+        ];
+
+        let provider, signer, contract, userAddress;
+
+        document.getElementById('connectBtn').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Force network switch or add GenLayer Studio
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: genLayerNetwork.chainId }],
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [genLayerNetwork],
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAddress = accounts[0];
+                    document.getElementById('walletText').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+                    document.getElementById('statusDot').classList.add('connected-dot');
+                    
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                } catch (error) {
+                    console.error("Connection failed", error);
+                    alert("Failed to connect or switch to GenLayer Studio network.");
+                }
+            } else {
+                alert("Please install MetaMask!");
+            }
+        });
+
+        function logToConsole(consoleId, msg, type = 'normal') {
+            const el = document.getElementById(consoleId);
+            el.innerHTML = msg;
+            el.className = 'console-output ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : type === 'warn' ? 'status-warn' : '');
+        }
+
+        async function executeTx(methodName, args, consoleId) {
+            if (!contract) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
+            try {
+                logToConsole(consoleId, `⚙️ Sending tx to ${methodName}...\nPlease approve in wallet.`, 'warn');
+                const tx = await contract[methodName](...args);
+                logToConsole(consoleId, `⏳ Tx sent! Hash: ${tx.hash}\nWaiting for block confirmation...`, 'warn');
+                await tx.wait();
+                logToConsole(consoleId, `✅ Transaction Confirmed!\nMethod: ${methodName} executed successfully.`, 'success');
+            } catch (error) {
+                console.error(error);
+                logToConsole(consoleId, `❌ Tx Failed: ${error.message || 'Unknown error'}`, 'error');
+            }
+        }
+
+        async function executeBatchEval() {
+            const input = document.getElementById('batchIds').value;
+            if(!input) return logToConsole('evalConsole', 'Error: Provide IDs', 'error');
+            const arr = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+            executeTx('evaluate_batch', [arr], 'evalConsole');
+        }
+
+        function getEvent() {
+            const idx = document.getElementById('eventIdx').value;
+            readData('get_event', [idx || 0], 'viewConsole');
+        }
+
+        async function readData(methodName, args, consoleId) {
+            if (!contract) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
+            try {
+                logToConsole(consoleId, `Fetching data from ${methodName}...`);
+                const result = await contract[methodName](...args);
+                let displayStr = result;
+                try { displayStr = JSON.stringify(JSON.parse(result), null, 2); } catch (e) {}
+                logToConsole(consoleId, displayStr, 'success');
+            } catch (error) {
+                console.error(error);
+                logToConsole(consoleId, `❌ Read Failed: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
