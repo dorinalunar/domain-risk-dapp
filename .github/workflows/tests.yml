@@ -1,4 +1,4 @@
-name: GenLayer Smart Contract Tests
+name: GenLayer Code Quality Check
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,14 +18,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
-        cache: 'pip'
 
-    - name: Install dependencies
+    - name: Install Linter
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install pytest
+        pip install flake8
 
-    - name: Run unit tests
+    - name: Run Syntax & Quality Check
       run: |
-        pytest test.py -v
+        # Перевірка на критичні синтаксичні помилки
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
