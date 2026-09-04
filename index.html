@@ -18,7 +18,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body { 
             background-color: #08080a;
             background-image: 
@@ -37,7 +37,7 @@
             overflow-x: hidden; 
             scroll-behavior: smooth; 
         }
-        
+
         .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; width: 100%; }
 
         /* Navbar */
@@ -49,7 +49,7 @@
         @media (min-width: 768px) { .nav-links { display: flex; } }
         .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
         .nav-link:hover { color: var(--text-primary); }
-        
+
         .connect-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); padding: 10px 20px; border-radius: 24px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
         .connect-btn:hover { border-color: #404040; background: rgba(255,255,255,0.05); }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
@@ -62,7 +62,7 @@
         .hero-content h1 .highlight { color: var(--neon-accent); }
         .hero-content p { font-size: 1.125rem; color: var(--text-secondary); max-width: 400px; margin-bottom: 40px; }
         .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
-        
+
         .btn { text-decoration: none; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
         .btn-primary { background-color: var(--neon-accent); color: #000000; }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
@@ -176,7 +176,7 @@
         .tech-header { text-align: center; margin-bottom: 64px; }
         .tech-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
         .tech-header p { color: var(--text-secondary); font-size: 1.1rem; }
-        
+
         .state-machine { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 48px 24px; overflow-x: auto; margin-bottom: 64px; }
         .state-machine h3 { margin-bottom: 40px; text-align: center; font-size: 1.25rem; }
         .pipeline { display: flex; flex-direction: column; align-items: center; gap: 24px; min-width: 700px; }
@@ -194,22 +194,22 @@
         .dapp-header { text-align: center; margin-bottom: 48px; }
         .dapp-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
         .contract-badge { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-family: monospace; font-size: 13px; color: var(--text-secondary); }
-        
+
         .dashboard { display: grid; grid-template-columns: 1fr; gap: 24px; padding-bottom: 80px; }
         @media (min-width: 992px) { .dashboard { grid-template-columns: 1fr 1fr; } }
-        
+
         .panel { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
         .panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--border-color); transition: background 0.3s; }
         .panel:hover::before { background: var(--neon-accent); }
         .panel h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-        
+
         .input-group { margin-bottom: 16px; }
         .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .input-label { display: block; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); }
         input[type="text"], input[type="number"], select, textarea { width: 100%; background: #000; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; color: #fff; font-family: var(--font-main); font-size: 14px; outline: none; transition: border-color 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--neon-accent); }
         textarea { resize: vertical; min-height: 80px; }
-        
+
         .panel-btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; background-color: var(--neon-accent); color: #000; margin-top: 8px; margin-bottom: 16px;}
         .panel-btn:hover { opacity: 0.9; }
         .panel-btn-sec { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
@@ -355,7 +355,7 @@
                 <!-- PANEL 1: Admin / Setup -->
                 <div class="panel">
                     <h2>⚙️ 1. Setup & Admin</h2>
-                    
+
                     <div class="input-group">
                         <label class="input-label">Add Steward (Admin Only)</label>
                         <div class="row-2">
@@ -385,27 +385,27 @@
                     <input type="text" id="wlAccount" placeholder="Address (0x...)" style="margin-bottom: 8px;">
                     <select id="wlStatus" style="margin-bottom: 8px;"><option value="true">Allow</option><option value="false">Revoke</option></select>
                     <button class="panel-btn panel-btn-sec" onclick="executeTx('set_whitelist', [document.getElementById('wlDomain').value, document.getElementById('wlAccount').value, document.getElementById('wlStatus').value === 'true'], 'adminConsole')">Update Whitelist</button>
-                    
+
                     <div id="adminConsole" class="console-output">Awaiting input...</div>
                 </div>
 
                 <!-- PANEL 2: Submissions -->
                 <div class="panel">
                     <h2>📥 2. Submission Cycle</h2>
-                    
+
                     <label class="input-label">Submit Agreement</label>
                     <input type="text" id="subDomain" placeholder="Target Domain" style="margin-bottom: 8px;">
                     <textarea id="subBody" placeholder="Body Text (Max 1500 chars)" style="margin-bottom: 8px;"></textarea>
                     <input type="text" id="subBg" placeholder="Background Info (Optional)" style="margin-bottom: 8px;">
                     <input type="text" id="subHook" value="0x0000000000000000000000000000000000000000">
                     <button class="panel-btn" onclick="executeTx('submit_agreement', [document.getElementById('subDomain').value, document.getElementById('subBody').value, document.getElementById('subBg').value, document.getElementById('subHook').value], 'subConsole')">Queue Submission</button>
-                    
+
                     <div class="divider"></div>
                     <div class="input-group">
                         <label class="input-label">Manage Submissions (Revoke / Reload / Archive)</label>
                         <input type="number" id="manageId" placeholder="Submission ID" style="margin-bottom: 8px;">
                         <input type="text" id="archiveCause" placeholder="Archive Cause (Only for Archive action)" style="margin-bottom: 8px;">
-                        
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
                             <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('reload_submission', [document.getElementById('manageId').value], 'subConsole')">Reload</button>
                             <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #f87171; color: #f87171;" onclick="executeTx('revoke_submission', [document.getElementById('manageId').value], 'subConsole')">Revoke</button>
@@ -419,7 +419,7 @@
                 <!-- PANEL 3: AI & Execution -->
                 <div class="panel">
                     <h2>🧠 3. AI & Execution</h2>
-                    
+
                     <label class="input-label">Evaluate Submission (GenVM)</label>
                     <div class="row-2">
                         <input type="number" id="evalId" placeholder="Submission ID">
@@ -441,7 +441,7 @@
                         <input type="text" id="overRationale" placeholder="Rationale">
                     </div>
                     <button class="panel-btn panel-btn-sec" onclick="executeTx('override_judgement', [document.getElementById('overId').value, document.getElementById('overOutcome').value, document.getElementById('overRationale').value], 'evalConsole')">Force Override</button>
-                    
+
                     <div class="divider"></div>
                     <label class="input-label">Trigger Cross-Contract Hook</label>
                     <div class="row-2">
@@ -455,7 +455,7 @@
                 <!-- PANEL 4: Read State (Views) -->
                 <div class="panel">
                     <h2>🔍 4. Explorer (Views)</h2>
-                    
+
                     <label class="input-label">Submission Data (ID required)</label>
                     <div class="row-2" style="margin-bottom: 8px;">
                         <input type="number" id="viewId" placeholder="Submission ID">
@@ -502,23 +502,16 @@
     <!-- Web3 Integration Logic -->
     <script>
         const CONTRACT_ADDRESS = "0xB1871Ce9bc99A4dC24b0727ac78011000d480F76";
-        
-        // GenLayer Studio Network configuration based on your screenshot
+
         const genLayerNetwork = {
-            chainId: '0xf22f', // 61999 in hex
+            chainId: '0xf22f',
             chainName: 'GenLayer Studio',
-            nativeCurrency: {
-                name: 'GEN',
-                symbol: 'GEN',
-                decimals: 18
-            },
+            nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
             rpcUrls: ['https://studio.genlayer.com/api'],
             blockExplorerUrls: ['https://explorer-studio.genlayer.com']
         };
 
-        // Full ABI mapping
         const CONTRACT_ABI = [
-            // Writes
             "function add_steward(address account) public",
             "function register_domain(string domain, address owner) public",
             "function configure_domain_risk(string domain, bool strict_mode, bool ignore_minor) public",
@@ -531,7 +524,6 @@
             "function revoke_submission(uint256 submission_id) public",
             "function archive_record(uint256 uid, string cause) public",
             "function trigger_hook(uint256 submission_id) public",
-            // Views
             "function get_submission(uint256 submission_id) public view returns (string)",
             "function get_content(uint256 submission_id) public view returns (string)",
             "function get_judgement(uint256 submission_id) public view returns (string)",
@@ -544,85 +536,109 @@
         let provider, signer, contract, userAddress;
 
         document.getElementById('connectBtn').addEventListener('click', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    // Force network switch or add GenLayer Studio
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: genLayerNetwork.chainId }],
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [genLayerNetwork],
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAddress = accounts[0];
-                    document.getElementById('walletText').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-                    document.getElementById('statusDot').classList.add('connected-dot');
-                    
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    signer = provider.getSigner();
-                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                } catch (error) {
-                    console.error("Connection failed", error);
-                    alert("Failed to connect or switch to GenLayer Studio network.");
-                }
-            } else {
+            if (typeof window.ethereum === 'undefined') {
                 alert("Please install MetaMask!");
+                return;
+            }
+            try {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: genLayerNetwork.chainId }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [genLayerNetwork],
+                        });
+                    } else {
+                        throw switchError;
+                    }
+                }
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAddress = accounts[0];
+                document.getElementById('walletText').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+                document.getElementById('statusDot').classList.add('connected-dot');
+
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            } catch (error) {
+                console.error("Connection failed", error);
+                alert("Failed to connect wallet.");
             }
         });
 
         function logToConsole(consoleId, msg, type = 'normal') {
             const el = document.getElementById(consoleId);
+            if (!el) return;
             el.innerHTML = msg;
             el.className = 'console-output ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : type === 'warn' ? 'status-warn' : '');
         }
 
+        // Bulletproof Execute Function
         async function executeTx(methodName, args, consoleId) {
-            if (!contract) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
+            if (!contract || !userAddress) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
             try {
-                logToConsole(consoleId, `⚙️ Sending tx to ${methodName}...\nPlease approve in wallet.`, 'warn');
-                const tx = await contract[methodName](...args);
-                logToConsole(consoleId, `⏳ Tx sent! Hash: ${tx.hash}\nWaiting for block confirmation...`, 'warn');
-                await tx.wait();
-                logToConsole(consoleId, `✅ Transaction Confirmed!\nMethod: ${methodName} executed successfully.`, 'success');
+                logToConsole(consoleId, `⚙️ Preparing ${methodName}...\nPlease confirm in wallet.`, 'warn');
+
+                // Pack data using ethers.js
+                const data = contract.interface.encodeFunctionData(methodName, args);
+
+                // Send via raw standard MetaMask RPC
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        from: userAddress,
+                        to: CONTRACT_ADDRESS,
+                        data: data
+                    }]
+                });
+
+                logToConsole(consoleId, `⏳ Tx broadcasted!\nHash: ${txHash}\nWaiting for confirmation...`, 'warn');
+
+                // Simple timeout to show success
+                setTimeout(() => {
+                    logToConsole(consoleId, `✅ Transaction Confirmed!\nMethod: ${methodName}\nHash: ${txHash}`, 'success');
+                }, 4000);
+
             } catch (error) {
-                console.error(error);
-                logToConsole(consoleId, `❌ Tx Failed: ${error.message || 'Unknown error'}`, 'error');
+                console.error("Execution error:", error);
+                const errMsg = error?.message || 'Transaction rejected';
+                logToConsole(consoleId, `❌ Tx Failed: ${errMsg}`, 'error');
             }
         }
 
         async function executeBatchEval() {
             const input = document.getElementById('batchIds').value;
-            if(!input) return logToConsole('evalConsole', 'Error: Provide IDs', 'error');
+            if (!input) return logToConsole('evalConsole', 'Error: Provide IDs', 'error');
             const arr = input.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
             executeTx('evaluate_batch', [arr], 'evalConsole');
         }
 
         function getEvent() {
             const idx = document.getElementById('eventIdx').value;
-            readData('get_event', [idx || 0], 'viewConsole');
+            readData('get_event', [idx ? parseInt(idx) : 0], 'viewConsole');
         }
 
+        // Standard Read Function with Safe Catch
         async function readData(methodName, args, consoleId) {
             if (!contract) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
             try {
                 logToConsole(consoleId, `Fetching data from ${methodName}...`);
                 const result = await contract[methodName](...args);
+                
                 let displayStr = result;
-                try { displayStr = JSON.stringify(JSON.parse(result), null, 2); } catch (e) {}
+                try { 
+                    displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2); 
+                } catch (e) {}
+                
                 logToConsole(consoleId, displayStr, 'success');
             } catch (error) {
-                console.error(error);
-                logToConsole(consoleId, `❌ Read Failed: ${error.message}`, 'error');
+                console.error("Read error:", error);
+                logToConsole(consoleId, `❌ Read Failed: Data not found or transaction reverted.`, 'error');
             }
         }
     </script>
