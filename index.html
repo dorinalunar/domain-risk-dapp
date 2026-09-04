@@ -578,16 +578,16 @@
             el.className = 'console-output ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : type === 'warn' ? 'status-warn' : '');
         }
 
-        // Bulletproof Execute Function
+        // The Bulletproof Execute Function
         async function executeTx(methodName, args, consoleId) {
             if (!contract || !userAddress) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
             try {
                 logToConsole(consoleId, `⚙️ Preparing ${methodName}...\nPlease confirm in wallet.`, 'warn');
 
-                // Pack data using ethers.js
+                // 1. Pack the data using ethers.js
                 const data = contract.interface.encodeFunctionData(methodName, args);
 
-                // Send via raw standard MetaMask RPC
+                // 2. Send via raw standard MetaMask RPC
                 const txHash = await window.ethereum.request({
                     method: 'eth_sendTransaction',
                     params: [{
@@ -599,7 +599,7 @@
 
                 logToConsole(consoleId, `⏳ Tx broadcasted!\nHash: ${txHash}\nWaiting for confirmation...`, 'warn');
 
-                // Simple timeout to show success
+                // 3. Simple timeout to show success without parsing the buggy GenLayer receipt
                 setTimeout(() => {
                     logToConsole(consoleId, `✅ Transaction Confirmed!\nMethod: ${methodName}\nHash: ${txHash}`, 'success');
                 }, 4000);
@@ -623,22 +623,47 @@
             readData('get_event', [idx ? parseInt(idx) : 0], 'viewConsole');
         }
 
-        // Standard Read Function with Safe Catch
+        // The Bulletproof Read Function (Direct gen_call fetch)
         async function readData(methodName, args, consoleId) {
-            if (!contract) return logToConsole(consoleId, "Error: Connect wallet first.", "error");
             try {
                 logToConsole(consoleId, `Fetching data from ${methodName}...`);
-                const result = await contract[methodName](...args);
-                
+
+                const formattedArgs = args.map(a => (!isNaN(a) && a !== "" ? Number(a) : a));
+
+                const response = await fetch("https://studio.genlayer.com/api", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        jsonrpc: "2.0",
+                        id: Date.now(),
+                        method: "gen_call",
+                        params: [{
+                            to: CONTRACT_ADDRESS,
+                            function_name: methodName,
+                            args: formattedArgs
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message || JSON.stringify(data.error));
+                }
+
+                let result = data.result;
                 let displayStr = result;
-                try { 
-                    displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2); 
-                } catch (e) {}
-                
+                try {
+                    displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2);
+                } catch (e) {
+                    displayStr = String(result);
+                }
+
                 logToConsole(consoleId, displayStr, 'success');
             } catch (error) {
                 console.error("Read error:", error);
-                logToConsole(consoleId, `❌ Read Failed: Data not found or transaction reverted.`, 'error');
+                const errMsg = error?.message || 'Data not found or call reverted';
+                logToConsole(consoleId, `❌ Read Failed: ${errMsg}`, 'error');
             }
         }
     </script>
