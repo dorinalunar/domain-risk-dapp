@@ -9,8 +9,12 @@
 ![Smart Contract](https://img.shields.io/badge/Smart_Contract-Python_3.9+-blue?style=for-the-badge&logo=python&logoColor=white)
 ![Frontend](https://img.shields.io/badge/Frontend-Vanilla_JS-orange?style=for-the-badge&logo=javascript&logoColor=white)
 ![SDK](https://img.shields.io/badge/SDK-genlayer--js-success?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-**DomainRiskManager** is a full-stack Intelligent dApp built for the **GenLayer "The Tank" Hackathon**. 
+> **🏆 Built exclusively for the GenLayer "The Tank" Hackathon.** 
+> Demonstrating the power of Intelligent Smart Contracts and Agentic UI design.
+
+**DomainRiskManager** is a full-stack Intelligent dApp built for the GenLayer ecosystem. 
 
 It acts as an autonomous semantic registry that leverages GenVM's non-deterministic AI consensus to evaluate, manage, and secure on-chain commitments. The project includes a robust Python-based Intelligent Contract and a fully integrated, modular Web3 frontend command center.
 
@@ -22,7 +26,7 @@ It acts as an autonomous semantic registry that leverages GenVM's non-determinis
 
 *   **DAO Governance:** Prevent contradictory proposals from passing by semantically checking new proposals against existing active rules.
 *   **DeFi Partnerships:** Automatically verify if a new marketing commitment violates exclusivity clauses of previous agreements.
-*   **Freelance & Escrow:** Ensure deliverables match the semantic intent of the initial contract before releasing funds, acting as an AI judge.
+*   **Freelance & Escrow:** Ensure deliverables match the semantic intent of the initial contract before releasing funds, acting as an autonomous AI judge.
 
 ---
 
@@ -37,11 +41,11 @@ It acts as an autonomous semantic registry that leverages GenVM's non-determinis
 ## 🛠️ Tech Stack & Architecture
 
 This dApp demonstrates a highly resilient, mobile-friendly Web3 architecture tailored specifically for the GenLayer ecosystem:
-*   **Smart Contract:** Native Python using the `py-genlayer` SDK, implementing `IResolutionListener` for cross-contract hooks and deterministic state management alongside AI logic.
+*   **Smart Contract:** Native Python using the `py-genlayer` SDK, implementing deterministic state management alongside AI logic.
 *   **Frontend Modular Design:** Built with Vanilla JS and ES Modules (via `esm.sh`) for seamless browser deployment without heavy build tools.
 *   **Hybrid RPC Integration:** 
     *   **Reads:** Utilizes the official `genlayer-js` SDK (`createClient`) for flawless state querying and JSON parsing.
-    *   **Writes:** Employs a custom raw JSON-RPC fallback wrapping payloads in Hex for MetaMask. This bypasses current `viem` mobile wallet compatibility issues (like BigInt parsing errors), ensuring 100% reliable execution of AI-driven state transitions (`run_nondet_unsafe`).
+    *   **Writes:** Employs a custom raw JSON-RPC fallback wrapping payloads in Hex for MetaMask. This bypasses current `viem` mobile wallet compatibility issues (like BigInt parsing errors), ensuring 100% reliable execution of AI-driven state transitions.
 
 ---
 
@@ -60,52 +64,25 @@ This dApp demonstrates a highly resilient, mobile-friendly Web3 architecture tai
 
 ---
 
-## 🚀 How to Use the dApp
+## 🧠 Under the Hood: AI Consensus in Action
 
-The frontend is divided into four main operational panels. Connect your wallet (GenLayer Studio network) and follow the flow:
+The core of the Intelligent Contract relies on GenVM's non-deterministic execution to resolve semantic state. Here is a glimpse of how the smart contract leverages LLMs natively on-chain:
 
-### 1. ⚙️ Setup & Admin (Domain Management)
-*   **Register Domain:** Create a new isolated registry (e.g., `marketing_q4`).
-*   **Whitelist Users:** Authorize specific wallet addresses to submit agreements to your domain.
-*   **Configure Risk:** Set semantic strictness levels for the AI consensus.
-
-### 2. 📥 Submission Cycle
-*   **Submit Agreement:** Enter your target domain and the full text of the commitment (e.g., *"Exclusive promo for Project Alpha in October"*).
-*   The contract stores this and returns a unique `Submission ID`.
-*   *Manage:* Ability to revoke or archive active submissions.
-
-### 3. 🧠 AI & Execution
-*   **Evaluate Submission:** Enter the `Submission ID` and trigger GenVM. The AI will semantically compare the new text against all `LIVE` agreements in that domain.
-*   **Steward Override:** Force a state change (`SAFE` or `CLASH`) if the AI returns an ambiguous result.
-
-### 4. 🔍 Explorer (Views)
-*   Read the current state (`QUEUED`, `LIVE`, `DENIED`, `MANUAL_CHECK`).
-*   Fetch detailed AI judgements (JSON rationale and detected conflicts).
-*   View global contract statistics and event logs.
-
----
-
-## 🏗️ State Machine Lifecycle
-
-Submissions flow through a strict on-chain state machine:
-
-```mermaid
-graph TD
-    A((Start)) -->|submit_agreement| B(QUEUED)
-    B -->|evaluate_submission| C{AI Consensus}
+```python
+# Snippet demonstrating GenVM AI integration
+def evaluate_submission(self, submission_id: int) -> None:
+    # ... fetching active landscape data ...
     
-    C -->|OUTCOME_SAFE| D[LIVE]
-    C -->|OUTCOME_CLASH| E[DENIED]
-    C -->|OUTCOME_UNCLEAR| F[MANUAL_CHECK]
+    # 🔮 Native AI execution on GenLayer Validators
+    result = genlayer.run_nondet_unsafe(
+        prompt=f"Analyze this new agreement against the active domain landscape: {active_texts}",
+        data=new_agreement_text,
+        config=risk_config
+    )
     
-    F -->|override_judgement| G{Steward Decision}
-    G -->|SAFE| D
-    G -->|CLASH| E
-    
-    D -->|archive_record| H(ARCHIVED)
-    B -->|revoke_submission| I(REVOKED)
-    F -->|revoke_submission| I
-    
-    style D fill:#2e7d32,stroke:#1b5e20,stroke-width:2px,color:#fff
-    style E fill:#c62828,stroke:#b71c1c,stroke-width:2px,color:#fff
-    style F fill:#f9a825,stroke:#f57f17,stroke-width:2px,color:#fff
+    # Deterministic state transition based on AI consensus
+    if result.outcome == "SAFE":
+        self.submissions[submission_id].state = "LIVE"
+    elif result.outcome == "CLASH":
+        self.submissions[submission_id].state = "DENIED"
+    # ...
