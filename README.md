@@ -2,21 +2,32 @@
 
 ![GenLayer](https://img.shields.io/badge/Network-GenLayer_Studio-blueviolet?style=for-the-badge)
 ![Smart Contract](https://img.shields.io/badge/Smart_Contract-Python_3.9+-blue?style=for-the-badge&logo=python&logoColor=white)
-![Frontend](https://img.shields.io/badge/Frontend-HTML%2FJS-orange?style=for-the-badge)
-![Type](https://img.shields.io/badge/Type-Intelligent_dApp-success?style=for-the-badge)
+![Frontend](https://img.shields.io/badge/Frontend-Vanilla_JS-orange?style=for-the-badge&logo=javascript&logoColor=white)
+![SDK](https://img.shields.io/badge/SDK-genlayer--js-success?style=for-the-badge)
 
 **DomainRiskManager** is a full-stack Intelligent dApp built for the **GenLayer "The Tank" Hackathon**. 
 
-It acts as an autonomous semantic registry that leverages GenVM's non-deterministic AI consensus to evaluate, manage, and secure on-chain commitments. The project includes a robust Python-based Intelligent Contract and a fully integrated Web3 frontend command center.
+It acts as an autonomous semantic registry that leverages GenVM's non-deterministic AI consensus to evaluate, manage, and secure on-chain commitments. The project includes a robust Python-based Intelligent Contract and a fully integrated, modular Web3 frontend command center.
 
 🔗 **[Launch Live dApp (Agentic Command Center)](https://dorinalunar.github.io/domain-risk-dapp/)**
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+This dApp demonstrates a highly resilient, mobile-friendly Web3 architecture tailored specifically for the GenLayer ecosystem:
+*   **Smart Contract:** Native Python using the `py-genlayer` SDK, implementing `IResolutionListener` for cross-contract hooks and deterministic state management alongside AI logic.
+*   **Frontend Modular Design:** Built with Vanilla JS and ES Modules (via `esm.sh`) for seamless browser deployment without heavy build tools.
+*   **Hybrid RPC Integration:** 
+    *   **Reads:** Utilizes the official `genlayer-js` SDK (`createClient`) for flawless state querying and JSON parsing.
+    *   **Writes:** Employs a custom raw JSON-RPC fallback wrapping payloads in Hex for MetaMask. This bypasses current `viem` mobile wallet compatibility issues (like BigInt parsing errors), ensuring 100% reliable execution of AI-driven state transitions (`run_nondet_unsafe`).
 
 ---
 
 ## ✨ Key Features
 
 ### 🖥️ Agentic Command Center (Frontend)
-*   **Seamless Web3 Integration:** Connect via MetaMask to the GenLayer Studio network directly from the browser.
+*   **Seamless Web3 Integration:** Connect via MetaMask to the GenLayer Studio network directly from the browser with automatic chain-switching.
 *   **4-Panel Dashboard:** Intuitive UI covering the entire lifecycle: Setup, Submission, AI Execution, and Block Explorer views.
 *   **Real-time Event Console:** Track transaction hashes, state changes, and AI rationale directly in the UI.
 
