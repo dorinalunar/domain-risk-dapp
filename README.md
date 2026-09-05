@@ -1,3 +1,8 @@
+<div align="center">
+  <img src="./logo.svg" alt="DomainRiskManager Logo" width="180" height="180">
+  <br>
+</div>
+
 # 🛡️ DomainRiskManager (GenLayer Full-Stack dApp)
 
 ![GenLayer](https://img.shields.io/badge/Network-GenLayer_Studio-blueviolet?style=for-the-badge)
@@ -10,6 +15,22 @@
 It acts as an autonomous semantic registry that leverages GenVM's non-deterministic AI consensus to evaluate, manage, and secure on-chain commitments. The project includes a robust Python-based Intelligent Contract and a fully integrated, modular Web3 frontend command center.
 
 🔗 **[Launch Live dApp (Agentic Command Center)](https://dorinalunar.github.io/domain-risk-dapp/)**
+
+---
+
+## 🌍 Real-World Use Cases
+
+*   **DAO Governance:** Prevent contradictory proposals from passing by semantically checking new proposals against existing active rules.
+*   **DeFi Partnerships:** Automatically verify if a new marketing commitment violates exclusivity clauses of previous agreements.
+*   **Freelance & Escrow:** Ensure deliverables match the semantic intent of the initial contract before releasing funds, acting as an AI judge.
+
+---
+
+## 📜 Deployment Details
+
+*   **Network:** GenLayer Studio (Chain ID: 62001)
+*   **Smart Contract Address:** `0xB1871Ce9bc99A4dC24b0727ac78011000d480F76`
+*   **Compiler:** GenLayer Studio Native Compiler (GenVM)
 
 ---
 
