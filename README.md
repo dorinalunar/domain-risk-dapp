@@ -103,3 +103,11 @@ Since the dApp is built with a modular Vanilla JS architecture and uses CDN impo
 * **Phase 1 (Mainnet Deployment):** Migrate the intelligent contract to the GenLayer Mainnet upon official network launch.
 * **Phase 2 (Multi-Agent Dispute Resolution):** Introduce secondary AI validation models for cross-verification on `MANUAL_CHECK` outcomes.
 * **Phase 3 (Dynamic Frontend Theming):** Enhance the UI with fully customizable themes for protocols building on top of the registry.
+
+---
+
+<div align="center">
+  <img src="./mascot.png" alt="Author" width="160" style="border-radius: 16px;">
+  <h3>Architected by Andrii (@dorinalunar)</h3>
+  <p><i>Autonomous Intelligent Contract & dApp Development</i></p>
+</div>
