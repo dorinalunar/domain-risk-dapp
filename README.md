@@ -64,25 +64,42 @@ This dApp demonstrates a highly resilient, mobile-friendly Web3 architecture tai
 
 ---
 
-## 🧠 Under the Hood: AI Consensus in Action
+## 🚀 How to Use the dApp
 
-The core of the Intelligent Contract relies on GenVM's non-deterministic execution to resolve semantic state. Here is a glimpse of how the smart contract leverages LLMs natively on-chain:
+The frontend is divided into four main operational panels. Connect your wallet (GenLayer Studio network) and follow the flow:
 
-```python
-# Snippet demonstrating GenVM AI integration
-def evaluate_submission(self, submission_id: int) -> None:
-    # ... fetching active landscape data ...
-    
-    # 🔮 Native AI execution on GenLayer Validators
-    result = genlayer.run_nondet_unsafe(
-        prompt=f"Analyze this new agreement against the active domain landscape: {active_texts}",
-        data=new_agreement_text,
-        config=risk_config
-    )
-    
-    # Deterministic state transition based on AI consensus
-    if result.outcome == "SAFE":
-        self.submissions[submission_id].state = "LIVE"
-    elif result.outcome == "CLASH":
-        self.submissions[submission_id].state = "DENIED"
-    # ...
+### 1. ⚙️ Setup & Admin (Domain Management)
+* **Register Domain:** Create a new isolated registry (e.g., `marketing_q4`).
+* **Whitelist Users:** Authorize specific wallet addresses to submit agreements to your domain.
+* **Configure Risk:** Set semantic strictness levels for the AI consensus.
+
+### 2. 📥 Submission Cycle
+* **Submit Agreement:** Enter your target domain and the full text of the commitment (e.g., *"Exclusive promo for Project Alpha in October"*).
+* The contract stores this and returns a unique `Submission ID`.
+
+### 3. 🧠 AI & Execution
+* **Evaluate Submission:** Enter the `Submission ID` and trigger GenVM. The AI will semantically compare the new text against all `LIVE` agreements in that domain.
+* **Steward Override:** Force a state change if the AI returns an ambiguous result.
+
+### 4. 🔍 Explorer (Views)
+* Read the current state (`QUEUED`, `LIVE`, `DENIED`, `MANUAL_CHECK`).
+* Fetch detailed AI judgements (JSON rationale and detected conflicts).
+* View global contract statistics and event logs.
+
+---
+
+## 🛠️ Local Development
+
+Since the dApp is built with a modular Vanilla JS architecture and uses CDN imports (`esm.sh`), running it locally requires zero build tools.
+
+1. Clone the repository: `git clone https://github.com/dorinalunar/domain-risk-dapp.git`
+2. Open `index.html` in any modern web browser or serve it via a simple local server.
+3. Connect your MetaMask to the GenLayer Studio network.
+
+---
+
+## 🗺️ Future Roadmap
+
+* **Phase 1 (Mainnet Deployment):** Migrate the intelligent contract to the GenLayer Mainnet upon official network launch.
+* **Phase 2 (Multi-Agent Dispute Resolution):** Introduce secondary AI validation models for cross-verification on `MANUAL_CHECK` outcomes.
+* **Phase 3 (Dynamic Frontend Theming):** Enhance the UI with fully customizable themes for protocols building on top of the registry.
