@@ -1,185 +1,167 @@
 import { createClient } from "https://esm.sh/genlayer-js";
+import { studionet } from "https://esm.sh/genlayer-js/chains";
 
 const CONTRACT_ADDRESS = "0xB1871Ce9bc99A4dC24b0727ac78011000d480F76";
-const studioChain = {
-    id: 62001,
-    name: 'GenLayer Studio',
-    nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
-    rpcUrls: {
-        default: { http: ['https://studio.genlayer.com/api'] },
-    }
-};
+let userAccount = null;
 
-let userAddress = null;
-let writeClient = null;
+// Read-only client using official studionet definition
+const readClient = createClient({ chain: studionet });
 
-const readClient = createClient({
-    chain: studioChain
-});
-
+// --- UI Logger ---
 window.logToConsole = function(consoleId, msg, type = 'normal') {
     const el = document.getElementById(consoleId);
     if (!el) return;
-    el.innerHTML = msg;
-    el.className = 'console-output ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : type === 'warn' ? 'status-warn' : '');
+    el.innerHTML = msg.replace(/\n/g, '<br>');
+    el.className = 'console-output';
+    if (type === 'error') el.classList.add('status-error');
+    else if (type === 'success') el.classList.add('status-success');
+    else if (type === 'warn') el.classList.add('status-warn');
+    el.scrollTop = el.scrollHeight;
 };
 
-document.getElementById('connectBtn').addEventListener('click', async () => {
-    if (typeof window.ethereum === 'undefined') {
+// --- Wallet Connection ---
+async function connectWallet() {
+    if (!window.ethereum) {
         alert("Please install MetaMask!");
-        return;
+        return null;
     }
-    
     try {
-        try {
-            await window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0xf22f' }],
-            });
-        } catch (switchError) {
-            if (switchError.code === 4902) {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: '0xf22f',
-                        chainName: 'GenLayer Studio',
-                        nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
-                        rpcUrls: ['https://studio.genlayer.com/api'],
-                    }],
-                });
-            } else {
-                throw switchError;
-            }
-        }
-
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userAddress = accounts[0];
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        userAccount = accounts[0];
         
-        document.getElementById('walletText').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-        document.getElementById('statusDot').classList.add('connected-dot');
-
-        writeClient = createClient({
-            chain: studioChain,
-            account: userAddress,
-            provider: window.ethereum
-        });
-
+        const walletText = document.getElementById('walletText');
+        if (walletText) walletText.innerText = userAccount.slice(0, 6) + "..." + userAccount.slice(-4);
+        
+        const statusDot = document.getElementById('statusDot');
+        if (statusDot) {
+            statusDot.classList.add('connected-dot');
+            statusDot.style.backgroundColor = '#4ade80';
+        }
+        
+        console.log("Wallet connected:", userAccount);
+        return userAccount;
     } catch (error) {
-        console.error("Connection failed", error);
-        alert("Failed to connect wallet or switch network.");
+        console.error("Connection error:", error);
+        return null;
     }
-});
+}
 
-window.executeTx = async function(methodName, args, consoleId) {
-    if (!userAddress) {
-        return window.logToConsole(consoleId, "Error: Connect wallet first.", "error");
+document.getElementById('connectBtn')?.addEventListener('click', connectWallet);
+
+// --- Transaction Execution (Identical to working snippet) ---
+window.executeTx = async function(functionName, args = [], consoleId = 'adminConsole') {
+    if (!userAccount) {
+        const connected = await connectWallet();
+        if (!connected) {
+            return window.logToConsole(consoleId, "Error: Connect wallet first.", "error");
+        }
     }
 
     try {
-        window.logToConsole(consoleId, `⚙️ Preparing ${methodName}...\nPlease confirm in wallet.`, 'warn');
+        window.logToConsole(consoleId, `⚙️ Preparing ${functionName}...\nPlease confirm in MetaMask.`, "warn");
 
-        const formattedArgs = args.map(a => {
-            if (a === "true") return true;
-            if (a === "false") return false;
-            if (Array.isArray(a)) {
-                return a.map(x => (!isNaN(x) && typeof x === 'string' && !x.startsWith('0x') ? BigInt(x) : x));
-            }
-            if (typeof a === 'string' && a.trim() !== "" && !isNaN(a) && !a.startsWith('0x')) {
-                return BigInt(a);
-            }
-            return a;
+        // Fresh client initialized directly on window.ethereum
+        const client = createClient({ 
+            chain: studionet, 
+            provider: window.ethereum, 
+            account: userAccount 
         });
 
-        // Try writing via SDK with fallback to direct JSON-RPC call
-        let result;
-        if (writeClient && typeof writeClient.writeContract === 'function') {
-            try {
-                result = await writeClient.writeContract({
-                    address: CONTRACT_ADDRESS,
-                    functionName: methodName,
-                    args: formattedArgs,
-                    value: 0n,
-                    gasPrice: 0n,
-                    gas: 20000000n
-                });
-            } catch (sdkErr) {
-                console.warn("writeClient failed, falling back to window.ethereum.request", sdkErr);
-            }
-        }
+        const tx = await client.writeContract({
+            address: CONTRACT_ADDRESS,
+            functionName: functionName,
+            args: args,
+            value: 0n 
+        });
 
-        if (!result) {
-            // Native GenVM RPC call
-            const payload = {
-                function_name: methodName,
-                args: formattedArgs.map(x => typeof x === 'bigint' ? Number(x) : x)
-            };
-            const jsonStr = JSON.stringify(payload);
-            const hexData = "0x" + Array.from(new TextEncoder().encode(jsonStr))
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-
-            result = await window.ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                    from: userAddress,
-                    to: CONTRACT_ADDRESS,
-                    data: hexData,
-                    gas: '0x1312D00'
-                }]
-            });
-        }
-
-        window.logToConsole(consoleId, `⏳ Tx broadcasted!\nHash: ${result}\nWaiting for consensus...`, 'warn');
-
-        setTimeout(() => {
-            window.logToConsole(consoleId, `✅ Transaction Broadcasted!\nMethod: ${methodName}\nTx: ${result}`, 'success');
-        }, 5000);
-
+        const hash = typeof tx === "string" ? tx : tx.txId;
+        window.logToConsole(consoleId, `✅ Transaction sent!\nMethod: ${functionName}\nHash: ${hash}`, "success");
     } catch (error) {
         console.error("Execution error:", error);
-        window.logToConsole(consoleId, `❌ Tx Failed: ${error.message || 'Transaction rejected'}`, 'error');
+        window.logToConsole(consoleId, `❌ Failed: ${error.shortMessage || error.message || 'Transaction rejected'}`, "error");
     }
 };
 
-window.readData = async function(methodName, args, consoleId) {
+// --- Read Contract Execution ---
+window.readData = async function(functionName, args = [], consoleId = 'viewConsole') {
     try {
-        window.logToConsole(consoleId, `Fetching data from ${methodName}...`);
-
-        const formattedArgs = args.map(a => {
-            if (a === "true") return true;
-            if (a === "false") return false;
-            if (typeof a === 'string' && a.trim() !== "" && !isNaN(a) && !a.startsWith('0x')) {
-                return BigInt(a);
-            }
-            return a;
-        });
+        window.logToConsole(consoleId, `Fetching data from ${functionName}...`, "normal");
 
         const result = await readClient.readContract({
             address: CONTRACT_ADDRESS,
-            functionName: methodName,
-            args: formattedArgs
+            functionName: functionName,
+            args: args
         });
-        
+
         let displayStr = result;
-        try { 
-            displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2); 
+        try {
+            displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2);
         } catch (e) {}
-        
-        window.logToConsole(consoleId, displayStr, 'success');
+
+        window.logToConsole(consoleId, `✅ Result:\n${displayStr}`, "success");
     } catch (error) {
         console.error("Read error:", error);
-        window.logToConsole(consoleId, `⚠️ Data not found or state is empty. (Reverted)`, 'warn');
+        window.logToConsole(consoleId, `⚠️ Error: ${error.shortMessage || error.message || 'Execution reverted'}`, "warn");
     }
 };
 
+// --- Panel 1: Setup & Admin Handlers ---
+window.addSteward = function() {
+    const acc = document.getElementById('addStewardAcc')?.value.trim();
+    if (!acc) return window.logToConsole('adminConsole', 'Error: Steward address required.', 'error');
+    window.executeTx('add_steward', [acc], 'adminConsole');
+};
+
+window.setWhitelist = function() {
+    const target = document.getElementById('whitelistAcc')?.value.trim();
+    const status = document.getElementById('whitelistStatus')?.value;
+    if (!target) return window.logToConsole('adminConsole', 'Error: Target address required.', 'error');
+    window.executeTx('set_whitelist', [target, status === 'true'], 'adminConsole');
+};
+
+// --- Panel 2: Register Domain & Agreement ---
+window.registerDomain = function() {
+    const domain = document.getElementById('regDomainName')?.value.trim();
+    const rules = document.getElementById('regRulesText')?.value.trim();
+    if (!domain) return window.logToConsole('registerConsole', 'Error: Domain name required.', 'error');
+    window.executeTx('register_domain', [domain, rules], 'registerConsole');
+};
+
+// --- Panel 3: Batch Evaluation & Resolution ---
 window.executeBatchEval = function() {
-    const input = document.getElementById('batchIds').value;
-    if (!input) return window.logToConsole('evalConsole', 'Error: Provide IDs', 'error');
+    const input = document.getElementById('batchIds')?.value.trim();
+    if (!input) return window.logToConsole('evalConsole', 'Error: Provide IDs.', 'error');
     const arr = input.split(',').map(s => s.trim()).filter(s => s !== "");
     window.executeTx('evaluate_batch', [arr], 'evalConsole');
 };
 
+window.resolveIssue = function() {
+    const id = document.getElementById('resolveId')?.value.trim();
+    const decision = document.getElementById('resolveDecision')?.value;
+    if (!id) return window.logToConsole('evalConsole', 'Error: Agreement ID required.', 'error');
+    window.executeTx('resolve_issue', [id, decision], 'evalConsole');
+};
+
+// --- Panel 4: Read & Query Views ---
+window.getDomainState = function() {
+    const actor = document.getElementById('dsActor')?.value.trim();
+    const domain = document.getElementById('dsDomain')?.value.trim();
+    if (!actor || !domain) return window.logToConsole('viewConsole', 'Error: Both Actor address and Domain are required.', 'error');
+    window.readData('get_domain_state', [actor, domain], 'viewConsole');
+};
+
+window.getIssue = function() {
+    const id = document.getElementById('issueAgreementId')?.value.trim();
+    const idx = document.getElementById('issueIndex')?.value.trim();
+    if (!id || idx === "") return window.logToConsole('viewConsole', 'Error: Agreement ID and Issue Index are required.', 'error');
+    window.readData('get_issue', [id, idx], 'viewConsole');
+};
+
 window.getEvent = function() {
-    const idx = document.getElementById('eventIdx').value;
-    window.readData('get_event', [idx ? idx : "0"], 'viewConsole');
+    const idx = document.getElementById('eventIdx')?.value.trim();
+    window.readData('get_event', [idx !== "" ? idx : "0"], 'viewConsole');
+};
+
+window.getGlobalStats = function() {
+    window.readData('get_global_stats', [], 'viewConsole');
 };
