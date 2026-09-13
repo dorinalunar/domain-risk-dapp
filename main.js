@@ -2,6 +2,14 @@ import { createClient } from "https://esm.sh/genlayer-js";
 import { studionet } from "https://esm.sh/genlayer-js/chains";
 
 const CONTRACT_ADDRESS = "0xB1871Ce9bc99A4dC24b0727ac78011000d480F76";
+const STUDIO_CHAIN_ID_HEX = '0xf22f';
+const studioChainParams = {
+    chainId: STUDIO_CHAIN_ID_HEX,
+    chainName: 'GenLayer Studio',
+    nativeCurrency: { name: 'GEN', symbol: 'GEN', decimals: 18 },
+    rpcUrls: ['https://studio.genlayer.com/api']
+};
+
 let userAccount = null;
 
 // Read-only client using official studionet definition
@@ -19,6 +27,26 @@ window.logToConsole = function(consoleId, msg, type = 'normal') {
     el.scrollTop = el.scrollHeight;
 };
 
+// --- Network Switch Helper ---
+async function switchNetwork() {
+    if (!window.ethereum) return;
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: STUDIO_CHAIN_ID_HEX }]
+        });
+    } catch (switchError) {
+        if (switchError.code === 4902) {
+            await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [studioChainParams]
+            });
+        } else {
+            throw switchError;
+        }
+    }
+}
+
 // --- Wallet Connection ---
 async function connectWallet() {
     if (!window.ethereum) {
@@ -26,6 +54,9 @@ async function connectWallet() {
         return null;
     }
     try {
+        // Force network switch on connect
+        await switchNetwork();
+
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         userAccount = accounts[0];
         
@@ -48,7 +79,7 @@ async function connectWallet() {
 
 document.getElementById('connectBtn')?.addEventListener('click', connectWallet);
 
-// --- Transaction Execution (Identical to working snippet) ---
+// --- Transaction Execution ---
 window.executeTx = async function(functionName, args = [], consoleId = 'adminConsole') {
     if (!userAccount) {
         const connected = await connectWallet();
@@ -58,7 +89,12 @@ window.executeTx = async function(functionName, args = [], consoleId = 'adminCon
     }
 
     try {
-        window.logToConsole(consoleId, `⚙️ Preparing ${functionName}...\nPlease confirm in MetaMask.`, "warn");
+        window.logToConsole(consoleId, `⚙️ Preparing ${functionName}...\nChecking network...`, "warn");
+
+        // Force network switch before sending transaction
+        await switchNetwork();
+        
+        window.logToConsole(consoleId, `Please confirm in MetaMask.`, "warn");
 
         // Fresh client initialized directly on window.ethereum
         const client = createClient({ 
