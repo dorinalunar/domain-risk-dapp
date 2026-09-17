@@ -12,10 +12,8 @@ const studioChainParams = {
 
 let userAccount = null;
 
-// Read-only client using official studionet definition
 const readClient = createClient({ chain: studionet });
 
-// --- UI Logger ---
 window.logToConsole = function(consoleId, msg, type = 'normal') {
     const el = document.getElementById(consoleId);
     if (!el) return;
@@ -27,7 +25,6 @@ window.logToConsole = function(consoleId, msg, type = 'normal') {
     el.scrollTop = el.scrollHeight;
 };
 
-// --- Network Switch Helper ---
 async function switchNetwork() {
     if (!window.ethereum) return;
     try {
@@ -47,28 +44,25 @@ async function switchNetwork() {
     }
 }
 
-// --- Wallet Connection ---
 async function connectWallet() {
     if (!window.ethereum) {
         alert("Please install MetaMask!");
         return null;
     }
     try {
-        // Force network switch on connect
         await switchNetwork();
-
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
         userAccount = accounts[0];
-        
+
         const walletText = document.getElementById('walletText');
         if (walletText) walletText.innerText = userAccount.slice(0, 6) + "..." + userAccount.slice(-4);
-        
+
         const statusDot = document.getElementById('statusDot');
         if (statusDot) {
             statusDot.classList.add('connected-dot');
             statusDot.style.backgroundColor = '#4ade80';
         }
-        
+
         console.log("Wallet connected:", userAccount);
         return userAccount;
     } catch (error) {
@@ -79,7 +73,6 @@ async function connectWallet() {
 
 document.getElementById('connectBtn')?.addEventListener('click', connectWallet);
 
-// --- Transaction Execution ---
 window.executeTx = async function(functionName, args = [], consoleId = 'adminConsole') {
     if (!userAccount) {
         const connected = await connectWallet();
@@ -89,14 +82,9 @@ window.executeTx = async function(functionName, args = [], consoleId = 'adminCon
     }
 
     try {
-        window.logToConsole(consoleId, `⚙️ Preparing ${functionName}...\nChecking network...`, "warn");
-
-        // Force network switch before sending transaction
+        window.logToConsole(consoleId, `Preparing ${functionName}...\nPlease confirm in MetaMask.`, "warn");
         await switchNetwork();
-        
-        window.logToConsole(consoleId, `Please confirm in MetaMask.`, "warn");
 
-        // Fresh client initialized directly on window.ethereum
         const client = createClient({ 
             chain: studionet, 
             provider: window.ethereum, 
@@ -110,15 +98,14 @@ window.executeTx = async function(functionName, args = [], consoleId = 'adminCon
             value: 0n 
         });
 
-        const hash = typeof tx === "string" ? tx : tx.txId;
-        window.logToConsole(consoleId, `✅ Transaction sent!\nMethod: ${functionName}\nHash: ${hash}`, "success");
+        const hash = typeof tx === "string" ? tx : (tx.txId || tx.hash);
+        window.logToConsole(consoleId, `Transaction sent!\nMethod: ${functionName}\nHash: ${hash}`, "success");
     } catch (error) {
         console.error("Execution error:", error);
-        window.logToConsole(consoleId, `❌ Failed: ${error.shortMessage || error.message || 'Transaction rejected'}`, "error");
+        window.logToConsole(consoleId, `Failed: ${error.shortMessage || error.message || 'Transaction rejected'}`, "error");
     }
 };
 
-// --- Read Contract Execution ---
 window.readData = async function(functionName, args = [], consoleId = 'viewConsole') {
     try {
         window.logToConsole(consoleId, `Fetching data from ${functionName}...`, "normal");
@@ -134,10 +121,10 @@ window.readData = async function(functionName, args = [], consoleId = 'viewConso
             displayStr = JSON.stringify(typeof result === 'string' ? JSON.parse(result) : result, null, 2);
         } catch (e) {}
 
-        window.logToConsole(consoleId, `✅ Result:\n${displayStr}`, "success");
+        window.logToConsole(consoleId, `Result:\n${displayStr}`, "success");
     } catch (error) {
         console.error("Read error:", error);
-        window.logToConsole(consoleId, `⚠️ Error: ${error.shortMessage || error.message || 'Execution reverted'}`, "warn");
+        window.logToConsole(consoleId, `Error: ${error.shortMessage || error.message || 'Execution reverted'}`, "warn");
     }
 };
 
@@ -148,56 +135,109 @@ window.addSteward = function() {
     window.executeTx('add_steward', [acc], 'adminConsole');
 };
 
-window.setWhitelist = function() {
-    const target = document.getElementById('whitelistAcc')?.value.trim();
-    const status = document.getElementById('whitelistStatus')?.value;
-    if (!target) return window.logToConsole('adminConsole', 'Error: Target address required.', 'error');
-    window.executeTx('set_whitelist', [target, status === 'true'], 'adminConsole');
-};
-
-// --- Panel 2: Register Domain & Agreement ---
 window.registerDomain = function() {
     const domain = document.getElementById('regDomainName')?.value.trim();
-    const rules = document.getElementById('regRulesText')?.value.trim();
-    if (!domain) return window.logToConsole('registerConsole', 'Error: Domain name required.', 'error');
-    window.executeTx('register_domain', [domain, rules], 'registerConsole');
+    const owner = document.getElementById('regDomainOwner')?.value.trim();
+    if (!domain || !owner) return window.logToConsole('adminConsole', 'Error: Domain and Owner address required.', 'error');
+    window.executeTx('register_domain', [domain, owner], 'adminConsole');
 };
 
-// --- Panel 3: Batch Evaluation & Resolution ---
+window.configureDomainRisk = function() {
+    const domain = document.getElementById('cfgDomain')?.value.trim();
+    const strict = document.getElementById('cfgStrict')?.value === 'true';
+    const minor = document.getElementById('cfgMinor')?.value === 'true';
+    if (!domain) return window.logToConsole('adminConsole', 'Error: Domain required.', 'error');
+    window.executeTx('configure_domain_risk', [domain, strict, minor], 'adminConsole');
+};
+
+window.setWhitelist = function() {
+    const domain = document.getElementById('wlDomain')?.value.trim();
+    const target = document.getElementById('wlAccount')?.value.trim();
+    const status = document.getElementById('wlStatus')?.value === 'true';
+    if (!domain || !target) return window.logToConsole('adminConsole', 'Error: Domain and Target address required.', 'error');
+    window.executeTx('set_whitelist', [domain, target, status], 'adminConsole');
+};
+
+// --- Panel 2: Submissions ---
+window.submitAgreement = function() {
+    const domain = document.getElementById('subDomain')?.value.trim();
+    const body = document.getElementById('subBody')?.value.trim();
+    const bg = document.getElementById('subBg')?.value.trim();
+    const hook = document.getElementById('subHook')?.value.trim() || "0x0000000000000000000000000000000000000000";
+    if (!domain || !body) return window.logToConsole('subConsole', 'Error: Domain and Agreement text required.', 'error');
+    window.executeTx('submit_agreement', [domain, body, bg, hook], 'subConsole');
+};
+
+window.manageSubmission = function(action) {
+    const id = document.getElementById('manageId')?.value.trim();
+    if (!id) return window.logToConsole('subConsole', 'Error: Submission ID required.', 'error');
+    const u256Id = BigInt(id);
+
+    if (action === 'reload') {
+        window.executeTx('reload_submission', [u256Id], 'subConsole');
+    } else if (action === 'revoke') {
+        window.executeTx('revoke_submission', [u256Id], 'subConsole');
+    } else if (action === 'archive') {
+        const cause = document.getElementById('archiveCause')?.value.trim();
+        if (!cause) return window.logToConsole('subConsole', 'Error: Archive cause required.', 'error');
+        window.executeTx('archive_record', [u256Id, cause], 'subConsole');
+    }
+};
+
+// --- Panel 3: AI & Execution Handlers ---
+window.evaluateSubmission = function() {
+    const id = document.getElementById('evalId')?.value.trim();
+    if (!id) return window.logToConsole('evalConsole', 'Error: Submission ID required.', 'error');
+    window.executeTx('evaluate_submission', [BigInt(id)], 'evalConsole');
+};
+
 window.executeBatchEval = function() {
     const input = document.getElementById('batchIds')?.value.trim();
     if (!input) return window.logToConsole('evalConsole', 'Error: Provide IDs.', 'error');
-    const arr = input.split(',').map(s => s.trim()).filter(s => s !== "");
+    const arr = input.split(',').map(s => BigInt(s.trim())).filter(n => !isNaN(Number(n)));
     window.executeTx('evaluate_batch', [arr], 'evalConsole');
 };
 
-window.resolveIssue = function() {
-    const id = document.getElementById('resolveId')?.value.trim();
-    const decision = document.getElementById('resolveDecision')?.value;
-    if (!id) return window.logToConsole('evalConsole', 'Error: Agreement ID required.', 'error');
-    window.executeTx('resolve_issue', [id, decision], 'evalConsole');
+window.overrideJudgement = function() {
+    const id = document.getElementById('overId')?.value.trim();
+    const outcome = document.getElementById('overOutcome')?.value;
+    const rationale = document.getElementById('overRationale')?.value.trim();
+    if (!id || !rationale) return window.logToConsole('evalConsole', 'Error: ID and Rationale required.', 'error');
+    window.executeTx('override_judgement', [BigInt(id), outcome, rationale], 'evalConsole');
+};
+
+window.triggerHook = function() {
+    const id = document.getElementById('hookId')?.value.trim();
+    if (!id) return window.logToConsole('evalConsole', 'Error: Submission ID required.', 'error');
+    window.executeTx('trigger_hook', [BigInt(id)], 'evalConsole');
 };
 
 // --- Panel 4: Read & Query Views ---
-window.getDomainState = function() {
-    const actor = document.getElementById('dsActor')?.value.trim();
-    const domain = document.getElementById('dsDomain')?.value.trim();
-    if (!actor || !domain) return window.logToConsole('viewConsole', 'Error: Both Actor address and Domain are required.', 'error');
-    window.readData('get_domain_state', [actor, domain], 'viewConsole');
+window.fetchSubmissionData = function(method) {
+    const id = document.getElementById('viewId')?.value.trim();
+    if (!id) return window.logToConsole('viewConsole', 'Error: Submission ID required.', 'error');
+    window.readData(method, [BigInt(id)], 'viewConsole');
 };
 
 window.getIssue = function() {
-    const id = document.getElementById('issueAgreementId')?.value.trim();
-    const idx = document.getElementById('issueIndex')?.value.trim();
-    if (!id || idx === "") return window.logToConsole('viewConsole', 'Error: Agreement ID and Issue Index are required.', 'error');
-    window.readData('get_issue', [id, idx], 'viewConsole');
+    const id = document.getElementById('viewId')?.value.trim();
+    const idx = document.getElementById('issueIdx')?.value.trim();
+    if (!id || idx === "") return window.logToConsole('viewConsole', 'Error: Submission ID and Issue Index required.', 'error');
+    window.readData('get_issue', [BigInt(id), Number(idx)], 'viewConsole');
+};
+
+window.getDomainState = function() {
+    const actor = document.getElementById('dsActor')?.value.trim();
+    const domain = document.getElementById('dsDomain')?.value.trim();
+    if (!actor || !domain) return window.logToConsole('viewConsole', 'Error: Actor and Domain required.', 'error');
+    window.readData('get_domain_state', [actor, domain], 'viewConsole');
 };
 
 window.getEvent = function() {
     const idx = document.getElementById('eventIdx')?.value.trim();
-    window.readData('get_event', [idx !== "" ? idx : "0"], 'viewConsole');
+    window.readData('get_event', [BigInt(idx || "0")], 'viewConsole');
 };
 
-window.getGlobalStats = function() {
-    window.readData('get_global_stats', [], 'viewConsole');
+window.getStats = function() {
+    window.readData('stats', [], 'viewConsole');
 };
