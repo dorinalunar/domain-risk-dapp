@@ -39,7 +39,6 @@
 
         .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; width: 100%; }
 
-        /* Navbar */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 32px 0; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; letter-spacing: -0.04em; }
         .logo img { width: 36px; height: 36px; border-radius: 8px; }
@@ -54,7 +53,6 @@
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
         .connected-dot { background-color: #4ade80; box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
 
-        /* Hero */
         .hero { display: grid; grid-template-columns: 1fr; gap: 64px; padding: 60px 0 80px; align-items: center; position: relative; }
         @media (min-width: 992px) { .hero { grid-template-columns: 1fr 1fr; } }
         .hero-content h1 { font-size: clamp(3rem, 5vw, 4.5rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 24px; }
@@ -68,20 +66,6 @@
         .btn-secondary { background-color: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-secondary:hover { background-color: var(--surface-hover); }
 
-        /* 3D Isometric Grid & Cube Graphic */
-        .hero-graphic { display: none; height: 420px; position: relative; align-items: center; justify-content: center; }
-        @media (min-width: 992px) { .hero-graphic { display: flex; } }
-        .iso-scene { position: relative; width: 340px; height: 340px; transform: rotateX(60deg) rotateZ(-45deg); transform-style: preserve-3d; }
-        .iso-grid { position: absolute; inset: -40px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 14px; transform-style: preserve-3d; }
-        .iso-tile { background: #121214; border-radius: 6px; border: 1px solid #222226; box-shadow: inset 0 0 10px rgba(255,255,255,0.02); }
-        .iso-glow { position: absolute; width: 170px; height: 170px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(2px); background: radial-gradient(circle, rgba(212, 249, 56, 0.45) 0%, rgba(212, 249, 56, 0.15) 45%, transparent 70%); filter: blur(16px); pointer-events: none; }
-        .cube-3d { position: absolute; top: 50%; left: 50%; width: 140px; height: 140px; margin-left: -70px; margin-top: -70px; transform-style: preserve-3d; transform: translateZ(70px); }
-        .cube-face { position: absolute; width: 140px; height: 140px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.08); }
-        .cube-top { transform: translateZ(70px); background: linear-gradient(135deg, #2b2b2f 0%, #1a1a1c 100%); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); }
-        .cube-front { transform: rotateX(-90deg) translateZ(70px); background: linear-gradient(180deg, #161618 0%, #0d0d0e 85%, rgba(212, 249, 56, 0.18) 100%); }
-        .cube-right { transform: rotateY(90deg) translateZ(70px); background: linear-gradient(180deg, #202024 0%, #111113 85%, rgba(212, 249, 56, 0.22) 100%); }
-
-        /* Stats Bar */
         .stats-bar { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; margin-bottom: 80px; }
         @media (min-width: 768px) { .stats-bar { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
         .stat-item { display: flex; align-items: flex-start; gap: 16px; }
@@ -89,44 +73,6 @@
         .stat-icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .stat-content h4 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
         .stat-content p { font-size: 0.875rem; color: var(--text-secondary); }
-
-        /* Features Section */
-        .features { display: grid; grid-template-columns: 1fr; gap: 64px; padding-bottom: 80px; }
-        @media (min-width: 992px) { .features { grid-template-columns: 350px 1fr; } }
-        .features-header h2 { font-size: 2.25rem; font-weight: 600; line-height: 1.2; margin-bottom: 16px; }
-        .features-header p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 32px; }
-        .features-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-        @media (min-width: 768px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
-        .feature-card { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px 24px; transition: background-color 0.2s; }
-        .feature-card:hover { background-color: var(--surface-hover); }
-        .feature-card .icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(212, 249, 56, 0.05); border: 1px solid rgba(212, 249, 56, 0.1); color: var(--neon-accent); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-        .feature-card .icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .feature-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 12px; }
-        .feature-card p { font-size: 0.9rem; color: var(--text-secondary); }
-
-        /* Architecture Section */
-        .technical-details { padding-bottom: 100px; }
-        .tech-header { text-align: center; margin-bottom: 64px; }
-        .tech-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
-        .tech-header p { color: var(--text-secondary); font-size: 1.1rem; }
-
-        .state-machine { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 24px; padding: 48px 24px; overflow-x: auto; margin-bottom: 64px; }
-        .state-machine h3 { margin-bottom: 40px; text-align: center; font-size: 1.25rem; }
-        .pipeline { display: flex; flex-direction: column; align-items: center; gap: 24px; min-width: 700px; }
-        .state-node { padding: 16px 32px; border-radius: 12px; text-align: center; min-width: 200px; }
-        .node-queued { border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); font-weight: 500; }
-        .node-ai { border: 1px solid var(--neon-accent); background: rgba(212, 249, 56, 0.05); color: var(--neon-accent); font-weight: 600; box-shadow: 0 0 20px rgba(212, 249, 56, 0.1); }
-        .node-outcomes { display: flex; gap: 40px; justify-content: center; width: 100%; }
-        .node-safe { border: 1px solid #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.05); width: 180px; }
-        .node-manual { border: 1px solid #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.05); width: 180px; }
-        .node-denied { border: 1px solid #f87171; color: #f87171; background: rgba(248, 113, 113, 0.05); width: 180px; }
-        .node-steward { border: 1px dashed var(--border-color); color: var(--text-secondary); font-size: 14px; padding: 12px 32px; }
-        .arrow-down { color: var(--border-color); font-size: 24px; }
-
-        /* Dashboard dApp Section */
-        .dapp-header { text-align: center; margin-bottom: 48px; }
-        .dapp-header h2 { font-size: 2.25rem; font-weight: 600; margin-bottom: 16px; }
-        .contract-badge { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-family: monospace; font-size: 13px; color: var(--text-secondary); }
 
         .dashboard { display: grid; grid-template-columns: 1fr; gap: 24px; padding-bottom: 80px; }
         @media (min-width: 992px) { .dashboard { grid-template-columns: 1fr 1fr; } }
@@ -159,15 +105,13 @@
         footer { border-top: 1px solid var(--border-color); padding: 40px 0; text-align: center; color: var(--text-secondary); font-size: 0.9rem; margin-top: auto; }
     </style>
 </head>
+<body>
     <div class="container">
-        <!-- Navbar -->
         <nav>
             <div class="logo">
-                <img src="logo.svg" alt="Logo">
                 DomainRisk<span>.</span>
             </div>
             <div class="nav-links">
-                <a href="#architecture" class="nav-link">Architecture</a>
                 <a href="#dapp" class="nav-link">dApp</a>
                 <a href="https://github.com/dorinalunar/domain-risk-dapp" target="_blank" class="nav-link">GitHub</a>
             </div>
@@ -177,110 +121,11 @@
             </button>
         </nav>
 
-        <!-- Hero Section -->
-        <main class="hero">
-            <div class="hero-content">
-                <h1>Evaluate today.<br><span class="highlight">Resolve</span> tomorrow.</h1>
-                <p>An autonomous Intelligent Smart Contract on GenLayer. Manage commitments, detect clashes, and enforce semantic rules.</p>
-                <div class="hero-btns">
-                    <a href="#dapp" class="btn btn-primary">Launch dApp <span>↓</span></a>
-                    <a href="#architecture" class="btn btn-secondary">Explore Architecture</a>
-                </div>
-            </div>
-            <div class="hero-graphic">
-                <div class="iso-scene">
-                    <div class="iso-grid">
-                        <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
-                        <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
-                        <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
-                        <div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div><div class="iso-tile"></div>
-                    </div>
-                    <div class="iso-glow"></div>
-                    <div class="cube-3d">
-                        <div class="cube-face cube-top"></div>
-                        <div class="cube-face cube-front"></div>
-                        <div class="cube-face cube-right"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Stats Bar -->
-        <section class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                <div class="stat-content"><h4>6</h4><p>Conflict Types</p></div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div>
-                <div class="stat-content"><h4>GenVM</h4><p>AI Consensus</p></div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
-                <div class="stat-content"><h4>py-genlayer</h4><p>SDK Integration</p></div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
-                <div class="stat-content"><h4>1.5k</h4><p>Char Text Limit</p></div>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features">
-            <div class="features-header">
-                <h2>Built for agents.</h2>
-                <p>Everything you need to secure decentralized commerce and commitments.</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                    <h3>Consensus</h3>
-                    <p>Leverages non-deterministic AI via run_nondet_unsafe to semantically analyze incoming agreements.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-                    <h3>Govern</h3>
-                    <p>Robust multi-state lifecycle with whitelist permissions and global steward override capabilities.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
-                    <h3>Integrate</h3>
-                    <p>Built-in IResolutionListener interface for seamless cross-contract event hooks and dApp syncing.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Architecture Section -->
-        <section class="technical-details" id="architecture">
-            <div class="tech-header">
-                <h2>Architecture & Logic</h2>
-                <p>Transparent state transitions and semantic rules engine.</p>
-            </div>
-            <!-- State Machine Diagram -->
-            <div class="state-machine">
-                <h3>Transaction Lifecycle</h3>
-                <div class="pipeline">
-                    <div class="state-node node-queued">📥 QUEUED <br><span style="font-size: 12px; color: var(--text-secondary);">Agreement Submitted</span></div>
-                    <div class="arrow-down">↓</div>
-                    <div class="state-node node-ai">🧠 GenVM AI Consensus <br><span style="font-size: 12px; font-weight: 400; font-family: monospace;">run_nondet_unsafe()</span></div>
-                    <div class="arrow-down">↓</div>
-                    <div class="node-outcomes">
-                        <div class="state-node node-safe">✅ LIVE<br><span style="font-size: 12px; font-weight: 400;">Outcome: Safe</span></div>
-                        <div class="state-node node-manual">⚠️ MANUAL_CHECK<br><span style="font-size: 12px; font-weight: 400;">Outcome: Unclear</span></div>
-                        <div class="state-node node-denied">❌ DENIED<br><span style="font-size: 12px; font-weight: 400;">Outcome: Clash</span></div>
-                    </div>
-                    <div class="arrow-down">↓</div>
-                    <div class="state-node node-steward">👑 Global Steward Override (Force execution)</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Interactive dApp Section -->
         <section id="dapp">
-            <div class="dapp-header">
+            <div style="text-align: center; margin-bottom: 48px;">
                 <h2>Agentic Command Center</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 16px;">Execute on-chain transactions via GenLayer Studio Network.</p>
-                <div class="contract-badge" id="contractAddr">0xB1871Ce9bc99A4dC24b0727ac78011000d480F76</div>
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">Execute on-chain transactions via GenLayer Studio Network (61999).</p>
+                <div style="display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-family: monospace; font-size: 13px; color: var(--neon-accent);">0xB1871Ce9bc99A4dC24b0727ac78011000d480F76</div>
             </div>
 
             <div class="dashboard">
@@ -291,7 +136,7 @@
                         <label class="input-label">Add Steward (Admin Only)</label>
                         <div class="row-2">
                             <input type="text" id="addStewardAcc" placeholder="Address 0x...">
-                            <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('add_steward', [document.getElementById('addStewardAcc').value], 'adminConsole')">Add Steward</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" onclick="addSteward()">Add Steward</button>
                         </div>
                     </div>
 
@@ -299,7 +144,7 @@
                     <label class="input-label">Register Domain</label>
                     <input type="text" id="regDomainName" placeholder="Domain Name (e.g. defi_q4)" style="margin-bottom: 8px;">
                     <input type="text" id="regDomainOwner" placeholder="Owner Address (0x...)">
-                    <button class="panel-btn" onclick="executeTx('register_domain', [document.getElementById('regDomainName').value, document.getElementById('regDomainOwner').value], 'adminConsole')">Register Domain</button>
+                    <button class="panel-btn" onclick="registerDomain()">Register Domain</button>
 
                     <div class="divider"></div>
                     <label class="input-label">Configure Domain Risk</label>
@@ -308,14 +153,14 @@
                         <select id="cfgStrict"><option value="true">Strict: True</option><option value="false">Strict: False</option></select>
                         <select id="cfgMinor"><option value="true">Ignore Minor: True</option><option value="false">Ignore Minor: False</option></select>
                     </div>
-                    <button class="panel-btn panel-btn-sec" onclick="executeTx('configure_domain_risk', [document.getElementById('cfgDomain').value, document.getElementById('cfgStrict').value === 'true', document.getElementById('cfgMinor').value === 'true'], 'adminConsole')">Save Config</button>
+                    <button class="panel-btn panel-btn-sec" onclick="configureDomainRisk()">Save Config</button>
 
                     <div class="divider"></div>
                     <label class="input-label">Set Whitelist</label>
                     <input type="text" id="wlDomain" placeholder="Domain Name" style="margin-bottom: 8px;">
                     <input type="text" id="wlAccount" placeholder="Address (0x...)" style="margin-bottom: 8px;">
                     <select id="wlStatus" style="margin-bottom: 8px;"><option value="true">Allow</option><option value="false">Revoke</option></select>
-                    <button class="panel-btn panel-btn-sec" onclick="executeTx('set_whitelist', [document.getElementById('wlDomain').value, document.getElementById('wlAccount').value, document.getElementById('wlStatus').value === 'true'], 'adminConsole')">Update Whitelist</button>
+                    <button class="panel-btn panel-btn-sec" onclick="setWhitelist()">Update Whitelist</button>
 
                     <div id="adminConsole" class="console-output">Awaiting input...</div>
                 </div>
@@ -328,7 +173,7 @@
                     <textarea id="subBody" placeholder="Body Text (Max 1500 chars)" style="margin-bottom: 8px;"></textarea>
                     <input type="text" id="subBg" placeholder="Background Info (Optional)" style="margin-bottom: 8px;">
                     <input type="text" id="subHook" value="0x0000000000000000000000000000000000000000">
-                    <button class="panel-btn" onclick="executeTx('submit_agreement', [document.getElementById('subDomain').value, document.getElementById('subBody').value, document.getElementById('subBg').value, document.getElementById('subHook').value], 'subConsole')">Queue Submission</button>
+                    <button class="panel-btn" onclick="submitAgreement()">Queue Submission</button>
 
                     <div class="divider"></div>
                     <div class="input-group">
@@ -337,9 +182,9 @@
                         <input type="text" id="archiveCause" placeholder="Archive Cause (Only for Archive action)" style="margin-bottom: 8px;">
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                            <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('reload_submission', [document.getElementById('manageId').value], 'subConsole')">Reload</button>
-                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #f87171; color: #f87171;" onclick="executeTx('revoke_submission', [document.getElementById('manageId').value], 'subConsole')">Revoke</button>
-                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="executeTx('archive_record', [document.getElementById('manageId').value, document.getElementById('archiveCause').value], 'subConsole')">Archive</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" onclick="manageSubmission('reload')">Reload</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #f87171; color: #f87171;" onclick="manageSubmission('revoke')">Revoke</button>
+                            <button class="panel-btn panel-btn-sec inline-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="manageSubmission('archive')">Archive</button>
                         </div>
                     </div>
                     <div id="subConsole" class="console-output">Awaiting submission...</div>
@@ -351,7 +196,7 @@
                     <label class="input-label">Evaluate Submission (GenVM)</label>
                     <div class="row-2">
                         <input type="number" id="evalId" placeholder="Submission ID">
-                        <button class="panel-btn inline-btn" onclick="executeTx('evaluate_submission', [document.getElementById('evalId').value], 'evalConsole')">Run AI Check</button>
+                        <button class="panel-btn inline-btn" onclick="evaluateSubmission()">Run AI Check</button>
                     </div>
 
                     <div class="divider"></div>
@@ -368,13 +213,13 @@
                         <select id="overOutcome"><option value="SAFE">SAFE (Live)</option><option value="CLASH">CLASH (Denied)</option></select>
                         <input type="text" id="overRationale" placeholder="Rationale">
                     </div>
-                    <button class="panel-btn panel-btn-sec" onclick="executeTx('override_judgement', [document.getElementById('overId').value, document.getElementById('overOutcome').value, document.getElementById('overRationale').value], 'evalConsole')">Force Override</button>
+                    <button class="panel-btn panel-btn-sec" onclick="overrideJudgement()">Force Override</button>
 
                     <div class="divider"></div>
                     <label class="input-label">Trigger Cross-Contract Hook</label>
                     <div class="row-2">
                         <input type="number" id="hookId" placeholder="Submission ID">
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="executeTx('trigger_hook', [document.getElementById('hookId').value], 'evalConsole')">Fire Hook</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="triggerHook()">Fire Hook</button>
                     </div>
                     <div id="evalConsole" class="console-output">Awaiting execution...</div>
                 </div>
@@ -385,18 +230,18 @@
                     <label class="input-label">Submission Data (ID required)</label>
                     <div class="row-2" style="margin-bottom: 8px;">
                         <input type="number" id="viewId" placeholder="Submission ID">
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_submission', [document.getElementById('viewId').value], 'viewConsole')">State</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="fetchSubmissionData('get_submission')">State</button>
                     </div>
                     <div class="row-2">
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_content', [document.getElementById('viewId').value], 'viewConsole')">Content Text</button>
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_judgement', [document.getElementById('viewId').value], 'viewConsole')">AI Judgement</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="fetchSubmissionData('get_content')">Content Text</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="fetchSubmissionData('get_judgement')">AI Judgement</button>
                     </div>
 
                     <div class="divider"></div>
                     <label class="input-label">Get Specific Issue (ID & Issue Index required)</label>
                     <div class="row-2">
                         <input type="number" id="issueIdx" placeholder="Issue Index (e.g. 0)">
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_issue', [document.getElementById('viewId').value, document.getElementById('issueIdx').value], 'viewConsole')">Fetch Issue</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="getIssue()">Fetch Issue</button>
                     </div>
 
                     <div class="divider"></div>
@@ -404,13 +249,13 @@
                     <input type="text" id="dsActor" placeholder="Actor Address 0x..." style="margin-bottom: 8px;">
                     <div class="row-2">
                         <input type="text" id="dsDomain" placeholder="Domain Name">
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('get_domain_state', [document.getElementById('dsActor').value, document.getElementById('dsDomain').value], 'viewConsole')">Fetch Domain</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="getDomainState()">Fetch Domain</button>
                     </div>
 
                     <div class="divider"></div>
                     <div class="row-2">
                         <button class="panel-btn panel-btn-sec inline-btn" onclick="getEvent()">Read Event log</button>
-                        <button class="panel-btn panel-btn-sec inline-btn" onclick="readData('stats', [], 'viewConsole')">Global Stats</button>
+                        <button class="panel-btn panel-btn-sec inline-btn" onclick="getStats()">Global Stats</button>
                     </div>
                     <input type="number" id="eventIdx" placeholder="Event Index (e.g. 0)" style="margin-top: 8px; width: 50%;">
                     <div id="viewConsole" class="console-output">Output will appear here...</div>
@@ -423,7 +268,6 @@
         </footer>
     </div>
 
-        <!-- MODULE SCRIPT -->
     <script type="module" src="./main.js"></script>
 </body>
 </html>
