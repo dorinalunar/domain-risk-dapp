@@ -11,8 +11,7 @@
 ![SDK](https://img.shields.io/badge/SDK-genlayer--js-success?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-> **🏆 Built exclusively for the GenLayer "The Tank" Hackathon.** 
-> Demonstrating the power of Intelligent Smart Contracts and Agentic UI design.
+> **Demonstrating the power of Intelligent Smart Contracts and Agentic UI design.**
 
 **DomainRiskManager** is a full-stack Intelligent dApp built for the GenLayer ecosystem. 
 
@@ -32,7 +31,7 @@ It acts as an autonomous semantic registry that leverages GenVM's non-determinis
 
 ## 📜 Deployment Details
 
-* **Network:** GenLayer Studio (Chain ID: 62001)
+* **Network:** GenLayer Studio (Chain ID: 61999)
 * **Smart Contract Address:** `0xB1871Ce9bc99A4dC24b0727ac78011000d480F76`
 * **Compiler:** GenLayer Studio Native Compiler (GenVM)
 
@@ -43,9 +42,7 @@ It acts as an autonomous semantic registry that leverages GenVM's non-determinis
 This dApp demonstrates a highly resilient, mobile-friendly Web3 architecture tailored specifically for the GenLayer ecosystem:
 * **Smart Contract:** Native Python using the `py-genlayer` SDK, implementing deterministic state management alongside AI logic.
 * **Frontend Modular Design:** Built with Vanilla JS and ES Modules (via `esm.sh`) for seamless browser deployment without heavy build tools.
-* **Hybrid RPC Integration:** 
-  * **Reads:** Utilizes the official `genlayer-js` SDK (`createClient`) for flawless state querying and JSON parsing.
-  * **Writes:** Employs a custom raw JSON-RPC fallback wrapping payloads in Hex for MetaMask. This bypasses current `viem` mobile wallet compatibility issues (like BigInt parsing errors), ensuring 100% reliable execution of AI-driven state transitions.
+* **SDK Integration:** Utilizes the official `genlayer-js` SDK (`createClient`) for both read operations (state querying and JSON parsing) and write operations, featuring dynamic network switching to ensure seamless MetaMask compatibility and type-safe transaction execution.
 
 ---
 
