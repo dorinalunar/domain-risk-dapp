@@ -216,14 +216,14 @@ window.triggerHook = function() {
 window.fetchSubmissionData = function(method) {
     const id = document.getElementById('viewId')?.value.trim();
     if (!id) return window.logToConsole('viewConsole', 'Error: Submission ID required.', 'error');
-    window.readData(method, [BigInt(id)], 'viewConsole');
+    window.readData(method, [parseInt(id, 10)], 'viewConsole');
 };
 
 window.getIssue = function() {
     const id = document.getElementById('viewId')?.value.trim();
     const idx = document.getElementById('issueIdx')?.value.trim();
     if (!id || idx === "") return window.logToConsole('viewConsole', 'Error: Submission ID and Issue Index required.', 'error');
-    window.readData('get_issue', [BigInt(id), Number(idx)], 'viewConsole');
+    window.readData('get_issue', [parseInt(id, 10), parseInt(idx, 10)], 'viewConsole');
 };
 
 window.getDomainState = function() {
@@ -235,7 +235,7 @@ window.getDomainState = function() {
 
 window.getEvent = function() {
     const idx = document.getElementById('eventIdx')?.value.trim();
-    window.readData('get_event', [BigInt(idx || "0")], 'viewConsole');
+    window.readData('get_event', [parseInt(idx || "0", 10)], 'viewConsole');
 };
 
 window.getStats = function() {
