@@ -17,8 +17,6 @@
 
 It acts as an autonomous semantic registry that leverages GenVM's non-deterministic AI consensus to evaluate, manage, and secure on-chain commitments. The project includes a robust Python-based Intelligent Contract and a fully integrated, modular Web3 frontend command center.
 
-🔗 **[Launch Live dApp (Agentic Command Center)](https://dorinalunar.github.io/domain-risk-dapp/)**
-
 ---
 
 ## 🌍 Real-World Use Cases
