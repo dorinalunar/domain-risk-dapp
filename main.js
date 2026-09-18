@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/genlayer-js";
 import { studionet } from "https://esm.sh/genlayer-js/chains";
 
-const CONTRACT_ADDRESS = "0xB1871Ce9bc99A4dC24b0727ac78011000d480F76";
+const CONTRACT_ADDRESS = "0xBfD7843AF81097Faec3Ce05A86B7E106BB78024e";
 const STUDIO_CHAIN_ID_HEX = '0xf22f';
 const studioChainParams = {
     chainId: STUDIO_CHAIN_ID_HEX,
