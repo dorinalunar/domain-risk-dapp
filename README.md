@@ -30,7 +30,7 @@ It acts as an autonomous semantic registry that leverages GenVM's non-determinis
 ## 📜 Deployment Details
 
 * **Network:** GenLayer Studio (Chain ID: 61999)
-* **Smart Contract Address:** `0xB1871Ce9bc99A4dC24b0727ac78011000d480F76`
+* **Smart Contract Address:** `0xBfD7843AF81097Faec3Ce05A86B7E106BB78024e`
 * **Compiler:** GenLayer Studio Native Compiler (GenVM)
 
 ---
