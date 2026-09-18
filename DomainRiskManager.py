@@ -28,7 +28,7 @@ LIMIT_DOMAIN_LEN = 100
 LIMIT_AGREEMENT_LEN = 1500
 LIMIT_BG_INFO_LEN = 800
 LIMIT_RATIONALE_LEN = 600
-LIMIT_MAX_ACTIVE = 5
+LIMIT_MAX_ACTIVE = 15
 LIMIT_MAX_ISSUES = 6
 NULL_ADDR = "0x0000000000000000000000000000000000000000"
 
@@ -141,8 +141,18 @@ class DomainRiskManager(gl.Contract):
             self.count_denied = self.count_denied - u256(1)
 
         safe_rationale = self._enforce_len(rationale, LIMIT_RATIONALE_LEN, "override rationale")
+        full_rationale = "STEWARD OVERRIDE: " + safe_rationale
+
         record["outcome"] = safe_outcome
-        record["rationale"] = "STEWARD OVERRIDE: " + safe_rationale
+        record["rationale"] = full_rationale
+        record["issues_count"] = 0
+
+        judgement_data = {
+            "outcome": safe_outcome,
+            "rationale": full_rationale,
+            "issues": []
+        }
+        self.database[self._judgement_id(submission_id)] = json.dumps(judgement_data)
 
         if safe_outcome == OUTCOME_SAFE:
             self._make_live(submission_id, record)
@@ -173,7 +183,7 @@ class DomainRiskManager(gl.Contract):
         safe_body = self._enforce_len(body_text, LIMIT_AGREEMENT_LEN, "body text")
         safe_bg = self._trim(bg_info, LIMIT_BG_INFO_LEN)
 
-        live_keys = self._get_domain_keys(actor, safe_domain)
+        live_keys = self._get_domain_keys(safe_domain)
         if len(live_keys) >= LIMIT_MAX_ACTIVE:
             raise gl.vm.UserError("HALT: Domain capacity exceeded")
         self._prevent_exact_clone(safe_body, live_keys)
@@ -190,7 +200,7 @@ class DomainRiskManager(gl.Contract):
             "state": STATE_QUEUED,
             "outcome": OUTCOME_NONE,
             "rationale": "",
-            "sync_version": self._domain_version(actor, safe_domain),
+            "sync_version": self._domain_version(safe_domain),
             "sync_keys": live_keys,
             "issues_count": 0,
             "hook_addr": str(self._to_addr(hook)),
@@ -207,9 +217,8 @@ class DomainRiskManager(gl.Contract):
         if record["state"] not in [STATE_QUEUED, STATE_MANUAL_CHECK]:
             raise gl.vm.UserError("HALT: Cannot reload in current state")
 
-        actor = self._to_addr(record["actor"])
         domain = str(record["domain"])
-        live_keys = self._get_domain_keys(actor, domain)
+        live_keys = self._get_domain_keys(domain)
 
         if len(live_keys) >= LIMIT_MAX_ACTIVE:
             raise gl.vm.UserError("HALT: Domain capacity exceeded")
@@ -221,7 +230,7 @@ class DomainRiskManager(gl.Contract):
         record["state"] = STATE_QUEUED
         record["outcome"] = OUTCOME_NONE
         record["rationale"] = ""
-        record["sync_version"] = self._domain_version(actor, domain)
+        record["sync_version"] = self._domain_version(domain)
         record["sync_keys"] = live_keys
         record["issues_count"] = 0
         self._wipe_judgement(submission_id)
@@ -245,10 +254,9 @@ class DomainRiskManager(gl.Contract):
         if record["state"] not in [STATE_QUEUED, STATE_MANUAL_CHECK]:
             raise gl.vm.UserError(f"HALT: Evaluation locked for uid {submission_id}")
 
-        actor = self._to_addr(record["actor"])
         domain = str(record["domain"])
 
-        if int(record["sync_version"]) != self._domain_version(actor, domain):
+        if int(record["sync_version"]) != self._domain_version(domain):
             raise gl.vm.UserError("HALT: State desync, reload required")
 
         sync_keys = self._to_str_array(record.get("sync_keys", []))
@@ -302,9 +310,8 @@ class DomainRiskManager(gl.Contract):
             raise gl.vm.UserError("HALT: Must be LIVE to archive")
 
         safe_cause = self._enforce_len(cause, LIMIT_RATIONALE_LEN, "cause")
-        actor = self._to_addr(record["actor"])
         domain = str(record["domain"])
-        keys = self._get_domain_keys(actor, domain)
+        keys = self._get_domain_keys(domain)
 
         target = str(uid)
         updated_keys = [k for k in keys if k != target]
@@ -312,8 +319,8 @@ class DomainRiskManager(gl.Contract):
         if len(updated_keys) == len(keys):
             raise gl.vm.UserError("HALT: Record missing in domain index")
 
-        self._set_domain_keys(actor, domain, updated_keys)
-        self._upgrade_version(actor, domain)
+        self._set_domain_keys(domain, updated_keys)
+        self._upgrade_version(domain)
 
         record["state"] = STATE_ARCHIVED
         record["rationale"] = safe_cause
@@ -392,12 +399,10 @@ class DomainRiskManager(gl.Contract):
     @gl.public.view
     def get_domain_state(self, actor: Address, domain: str) -> str:
         clean_d = self._sanitize_domain(domain)
-        actor_addr = self._to_addr(actor)
         return json.dumps({
-            "actor": str(actor_addr),
             "domain": clean_d,
-            "version": self._domain_version(actor_addr, clean_d),
-            "active_keys": self._get_domain_keys(actor_addr, clean_d),
+            "version": self._domain_version(clean_d),
+            "active_keys": self._get_domain_keys(clean_d),
         })
 
     @gl.public.view
@@ -624,19 +629,19 @@ class DomainRiskManager(gl.Contract):
         c = v.strip()
         return c if len(c) <= l else c[:l]
 
-    def _get_domain_keys(self, actor: Address, domain: str) -> list:
-        key = "keys:" + str(actor).lower() + ":" + domain
+    def _get_domain_keys(self, domain: str) -> list:
+        key = "keys:domain:" + domain
         return self._to_str_array(json.loads(self.database[key])) if key in self.database else []
 
-    def _set_domain_keys(self, actor: Address, domain: str, keys: list) -> None:
-        self.database["keys:" + str(actor).lower() + ":" + domain] = json.dumps(keys)
+    def _set_domain_keys(self, domain: str, keys: list) -> None:
+        self.database["keys:domain:" + domain] = json.dumps(keys)
 
-    def _domain_version(self, actor: Address, domain: str) -> int:
-        return int(self.database.get("v:" + str(actor).lower() + ":" + domain, "0"))
+    def _domain_version(self, domain: str) -> int:
+        return int(self.database.get("v:domain:" + domain, "0"))
 
-    def _upgrade_version(self, actor: Address, domain: str) -> None:
-        v = self._domain_version(actor, domain) + 1
-        self.database["v:" + str(actor).lower() + ":" + domain] = str(v)
+    def _upgrade_version(self, domain: str) -> None:
+        v = self._domain_version(domain) + 1
+        self.database["v:domain:" + domain] = str(v)
 
     def _to_str_array(self, raw) -> list:
         if not isinstance(raw, list):
@@ -655,14 +660,13 @@ class DomainRiskManager(gl.Contract):
                 raise gl.vm.UserError("HALT: Clone detected in domain")
 
     def _make_live(self, uid: u256, record: dict) -> None:
-        actor = Address(record["actor"])
         domain = str(record["domain"])
-        keys = self._get_domain_keys(actor, domain)
+        keys = self._get_domain_keys(domain)
         if len(keys) >= LIMIT_MAX_ACTIVE:
             raise gl.vm.UserError("HALT: Domain capacity exceeded")
         keys.append(str(uid))
-        self._set_domain_keys(actor, domain, keys)
-        self._upgrade_version(actor, domain)
+        self._set_domain_keys(domain, keys)
+        self._upgrade_version(domain)
         record["state"] = STATE_LIVE
         self._save_record(uid, record)
         self.count_live = self.count_live + u256(1)
